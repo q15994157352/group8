@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>公司审核</title>
+    <!--<script src="js/vue.js"></script>-->
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+        <el-table
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="bci_id"
+                    label="公司ID"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bci_name"
+                    label="公司名称"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bci_type"
+                    label="公司类型"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bdi_name"
+                    label="法人姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bs_state"
+                    label="状态"
+                    width="180">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-row>
+    <el-row>
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[2,3,10,15]"
+                :page-size="3"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+        </el-pagination>
+    </el-row>
+    <el-row>
+        <el-dialog :title="title" :visible.sync="dialogFormVisible">
+            <el-form :model="formOpt" label-width="250px" :disabled="true">
+                <el-input v-model="formOpt.empNo" autocomplete="off" type="hidden"></el-input>
+                <el-divider>公司详情</el-divider>
+                <el-form-item label="公司ID" maxlength="10" :label-width="formLabelWidth" >
+                    <el-input v-model="formOpt.bci_id" autocomplete="off" ></el-input>
+                </el-form-item>
+                <el-form-item label="公司名称" maxlength="10" :label-width="formLabelWidth" >
+                    <el-input v-model="formOpt.bci_name" autocomplete="off" ></el-input>
+                </el-form-item>
+                <el-form-item label="公司类型" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bci_type" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="公司地址" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bci_address" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="银行卡号" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bci_bankcard" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="公司邮箱" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bci_email" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="公司业务" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bci_business" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="公司头像" :label-width="formLabelWidth">
+                    <el-image
+                            height="160px; " width="250px"
+                            :preview-src-list= "'/Review/show?fileName='+formOpt.bci_headpic"
+                              :src="'/Review/show?fileName='+formOpt.bci_headpic"></el-image>
+                </el-form-item>
+                <!--<el-form-item label="营业执照" :label-width="formLabelWidth">-->
+                <!--<el-image height="160px;" :preview-src-list="'show?fileName='+businessForm.headpic" width="250px"
+                :src="'show?fileName='+businessForm.headpic">-->
+                <!--</el-image>-->
+                <!--</el-form-item>-->
+                <!--return ResponseEntity.ok(resourceLoader.getResource("ftp://"+ftpConfig.getFtpUserName()+":"+ftpConfig.getFtpPassWord()+"@"-->
+                <!--+ftpConfig.getRemoteIp()+ftpConfig.getRemotePath()+"/"+fileName));-->
+                <!--}-->
+
+                <el-divider>法人详情</el-divider>
+                </el-form-item>
+                <el-form-item label="法人姓名" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bdi_name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="法人性别" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bdi_sex" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="法人电话" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bdi_tel" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="身份证正面" :label-width="formLabelWidth">
+                    <el-image
+                            height="160px; " width="250px"
+                            :preview-src-list= "'/Review/show?fileName='+formOpt.bdi_headpic_p"
+                            :src="'/Review/show?fileName='+formOpt.bdi_headpic_p">
+                    </el-image>
+                </el-form-item>
+                <!--<el-image-->
+                        <!--height="160px; " width="250px"-->
+                        <!--:preview-src-list= "'/Review/show?fileName='+formOpt.bci_headpic"-->
+                        <!--:src="'/Review/show?fileName='+formOpt.bci_headpic">-->
+                    <!---->
+                <!--</el-image>-->
+                <el-form-item label="身份证反面" :label-width="formLabelWidth">
+                    <el-image
+                            height="160px; " width="250px"
+                            :preview-src-list= "'/Review/show?fileName='+formOpt.bdi_headpic_n"
+                            :src="'/Review/show?fileName='+formOpt.bdi_headpic_n">
+                    </el-image>
+                </el-form-item>
+                <el-divider>贷款详情</el-divider>
+                <el-form-item label="审核管理员" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.ba_id" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="贷款状态" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bs_state" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="reject(formOpt)">驳回</el-button>
+                <el-button type="primary" @click="Submit(formOpt)">通过</el-button>
+            </div>
+            <el-dialog
+                    width="30%"
+                    title="审核不通过"
+                    :modal-append-to-body="false"
+                    :visible.sync="innerVisible"
+                    append-to-body>
+                <el-form :model="borrowNoForm" ref="borrowNoForm" label-width="120px">
+                    驳回原因：
+                    <el-input
+                            placeholder="请输入驳回原因"
+                            v-model="borrowNoForm.reason">
+                    </el-input>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="innerVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="saveData()">确 定</el-button>
+                </div>
+            </el-dialog>
+        </el-dialog>
+    </el-row>
+</div>
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            form:{empNo:'',job:'',deptNo:''},
+            currentPage:1,
+            pageSize:3,
+            total:300,
+            title:'1',
+            outerVisible:false,
+            innerVisible:false,
+            dialogFormVisible:false,
+            formLabelWidth:"120px",
+            formOpt:{bci_name:"",bci_id:0,bs_state:"",bdi_id:0,bdi_name:"",ba_id:0,bdi_tel:0,bci_email:0,bu_id:0},
+            requestURL:'',
+            options:[],
+            borrowNoForm:{'reason':''}
+        },
+        created: function () {
+            this.loadData();
+        },
+        methods: {
+            loadData: function () {
+                var self = this;//代表Vue对象
+                //计算开始值
+                var start = (this.currentPage - 1) * this.pageSize;
+                //计算结束值
+                var end = this.currentPage * this.pageSize + 1;
+                //self.form.push("start",start);
+                //self.form.push("end",end);
+                var searchForm = {"start": start, "end": end};
+                axios.post('/page', searchForm).then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data.pageList;
+                    self.total = response.data.pageMap;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            handleSizeChange: function (val) {//每页显示数量改变时触发
+                console.log("每页" + val + "条");
+                this.pageSize = val;
+                this.loadData();
+            },
+            handleCurrentChange: function (val) {//第几页发生变化时触发
+                console.log("当前页: " + val);
+                this.currentPage = val;
+                this.loadData();
+            },
+            handleEdit: function (index, row) {
+                this.title = "详细信息";
+                this.requestURL = "/boList";
+                this.formOpt = row;
+                this.dialogFormVisible = true;
+                console.log(index, row);
+            },
+            //通过
+            Submit: function (formOpt) {
+                this.requestURL = "/update";
+                var self = this;
+                axios.post(self.requestURL, "bci_id=" + this.formOpt.bci_id+ "&ba_id="+ this.formOpt.ba_id
+                    +"&bs_message="+"公司信息审核已通过"+"&bs_status="+"审核通过"
+                ).then(function (response) {
+//                    alert(this.formOpt.bci_id);
+//                    axios.post(self.requestURL, "bli_id=" + this.formOpt.bli_id + "&bci_id=" + this.formOpt.bci_id+
+//                        "&reason="+ this.borrowNoForm.reason + "&ba_id=" + this.formOpt.ba_id+"&bu_id="+this.formOpt.bu_id
+                    if (response != "0") {
+                        self.$message({
+                            message: '恭喜你，操作成功',
+                            type: 'success'
+                        });
+                        self.dialogFormVisible=false;
+                        self.loadData();
+                    } else {
+                        self.$message.error('错了哦');
+                    }
+                }).catch(function (errot) {
+                    console.log(error);
+                });
+            },
+
+            //驳回
+            reject:function(formOpt) {
+                this.innerVisible=true;
+            },
+            saveData:function(){
+                this.requestURL = "/reason";
+                var self = this;
+//                self.formOpt.reason=this.$refs.reason.value;
+                axios.post(self.requestURL,"bci_id=" + this.formOpt.bci_id+
+                    "&reason="+ this.borrowNoForm.reason + "&ba_id=" + this.formOpt.ba_id
+                    +"&bs_message="+"公司审核审核未通过"+"&bs_status="+"公司审核驳回"
+                ).then(function (response) {
+                    if (response !=="0") {
+                        self.$message({
+                            message: '恭喜你，操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出的form
+                        self.innerVisible = false;
+                        self.dialogFormVisible = false;
+                        self.loadData();
+                    } else {
+                        self.$message.error('错了哦');
+                    }
+                }).catch(function (errot) {
+                    console.log(error);
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

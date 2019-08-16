@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="zh-CN" xml:lang="zh-CN">
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <link rel="shortcut icon" href="/images/favicon.ico" />
+ <title>登录账号-login.html</title>
+ <!--页面框架样式-->
+ <link href="/css/bootstrap.min.css" rel="stylesheet" />
+ <link href="/css/components.css?ver=142682356" rel="stylesheet" />
+ <link href="/css/main.css?ver=142682356" rel="stylesheet" />
+ <link href="/css/new-home.css?ver=142682356" rel="stylesheet" />
+
+ <!--登录模块样式-->
+ <link href="/css/common.css" rel="stylesheet" />
+ <link href="/css/register.css" rel="stylesheet" type="text/css">
+ <script type="text/javascript" src="/script/common.js"></script>
+ <script src="/script/login.js" type="text/javascript"></script>
+
+ <script src="/js/jquery-1.11.0.min.js"></script>
+
+ <!--js中的代码-->
+ <script type="text/javascript" src="/js/jquery.min.js"></script>
+
+ <style>
+  #login{
+   width: 120px;
+   height: 45px;
+   background-color: rgba(0,0,0,0.0);
+  }
+ </style>
+
+</head>
+<body>
+<div class="wrapper login">
+
+
+ <script>
+     $("#page1").load("head.html");
+ </script>
+ <div id="head"></div>
+ <!--引入头部-->
+ <!--登录模块-->
+ <div class="wrap">
+  <form id="LonginForm" name="LonginForm" action="" method="post">
+   <div class="tdbModule loginPage">
+    <div class="registerTitle">用户登录</div>
+    <!--统一警告，提示信息-->
+    <div>
+     <p id="p" style="margin-left: 100px; margin-top: 20px" >&nbsp;</p>
+    </div>
+
+    <div class="registerCont">
+     <ul>
+      <li>
+       <span class="dis">用户名：</span>
+       <input class="input" type="text"  name="j_username" id="userName" maxlength="24" tabindex="1" autocomplete="off">
+       <a id="sssdfasdfas" href="create.html" class="blue">注册用户</a>
+      </li>
+
+      <li>
+       <span class="dis">密码：</span>
+       <input class="input" type="password" name="password" id="password" maxlength="24" tabindex="1" autocomplete="off">
+       <a href="#" id="pawHide" class="blue">忘记密码</a>
+      </li>
+      <!--<li>-->
+      <!--<span class="dis">验证码：</span>-->
+      <!--<input type="text" onkeyup="verify(this)" id="jpgVerify" style="width:166px;" class="input" name="yzm" data-msg="验证码" maxlength="4" tabindex="1" autocomplete="off">-->
+       <!--<a href="javascript:void(0);" title="点击更换验证码">-->
+        <!--<img id="imgVerify" src="login/getVerify" alt="更换验证码" height="36" width="170" onclick="getVerify(this);">-->
+       <!--</a>-->
+
+     <!--</li>-->
+      <li class="telNumber">
+       <span class="dis">手机号码:</span>
+       <input type="text" class="input _phoneNum" id="phone" name="phone" tabindex="1" maxlength="11" onblur="telphone()" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+       <a href="javascript:void(0);" class="button radius1 _getkey" id="sendPhone">获取验证码</a>
+       <span id="phoneJy" data-info="请输入您的常用电话">请输入您的常用电话</span>
+      </li>
+      <li class="telNumber"><span class="dis">短信验证码:</span>
+       <!--验证码-->
+       <input id="phonVerify" type="text" class="input input1  _phonVerify" data-_id="phonVerify" tabindex="1">
+       <span class="info" id="phonVerifys" data-info="请输入手机验证码">请输入手机验证码</span>
+      </li>
+
+      <li class="btn">
+       <!--<input type="button" class="radius1" value="立即登录" id="submitBtn" onclick="sublogin()" disabled="disabled">-->
+       <a  class="radius1"  id="submitBtn" onclick="sublogin()" disabled="disabled">
+        <button type="button" id="login">立即登录</button>
+       </a>
+
+      </li>
+     </ul>
+    </div>
+   </div>
+  </form>
+ </div>
+ <!--登录模块-->
+
+ <!--引入底部-->
+ <div id="last"></div>
+ <!--引入底部-->
+
+
+</div>
+</body>
+</html>
+<!--引入外部页面-->
+<script>
+    $("#head").load("head.html");
+    $("#last").load("last.html");
+</script>
+<!--引入外部页面-->
+
+
+<script>
+    $(function () {
+        $("#login").click(function () {
+            var username = $("#userName").val();
+            var password = $("#password").val();
+            var phone = $("#phone").val();
+            var login = $("#phonVerify").val();
+//            Ajax提交数据
+            $.ajax({
+                url: '/admin/tologin',
+                type: 'post',
+                data: {"username":username,"password":password,"phone":phone,"login":login},
+                dataType: "text",
+                success: function (msg) {
+                    if (msg=='suc'){
+                        location.href="/front/index.html";
+                    }else {
+                        alert(msg);
+                    }
+                }
+            });
+        })
+
+    })
+</script>
+
+<script>
+    //去获取验证码
+    $("#sendPhone").click(function () {
+        var phone = $("#phone").val();
+        var username = $("#userName").val();
+
+        $.ajax({
+            url: '/send/adminmessage',
+            type: 'post',
+            data: {"phone":phone,"username":username},
+            dataType: "json",
+            success: function (data) {
+                if (data.code=="500"){
+                    $("#p").html("请输入正确的手机号！").css("color","red");
+                }else if(data.code=="200"){
+                    $("#p").html("验证码已发送!").css("color","green");
+                    console.log("验证码："+data.reandom);
+                }else if(data.code=="100"){
+                    $("#p").html("非注册手机号，请正确输入!").css("color","red");
+                }else {
+                    $("#p").html("异常，请重新发送验证码!").css("color","red");
+                    console.log(data.message);
+                }
+            }
+        })
+    });
+</script>
+
+

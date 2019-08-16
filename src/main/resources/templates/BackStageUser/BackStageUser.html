@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title111111111111</title>
+    <script type="text/javascript" src="static/js/jquery-2.1.4.min.js"></script>
+    <!--<script src="js/vue.js"></script>-->
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+        <el-form ref="form" :inline="true" :model="form" label-width="80px">
+            <el-form-item label="员工姓名">
+                <el-input v-model="form.bu_username" placeholder="请输入员工姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="search">查询</el-button>
+                <el-button type="primary" @click="handleAdd">添加</el-button>
+            </el-form-item>
+        </el-form>
+    </el-row>
+    <el-row>
+        <el-table
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="bu_id"
+                    label="员工编号"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_username"
+                    label="员工姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_sex"
+                    label="性别"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_tel"
+                    label="员工电话"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_address"
+                    label="家庭住址"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_hiredate"
+                    label="雇佣时间"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="br_name"
+                    label="角色权限"
+                    width="180">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+
+        </el-table>
+    </el-row>
+    <el-row>
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[2,3,10,15,20,100, 200, 300, 400]"
+                :page-size="2"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+        </el-pagination>
+    </el-row>
+    <el-row>
+        <el-dialog :title="title" :visible.sync="dialogFormVisible" @close="dialogFormVisible">
+            <el-form :model="formOpt" label-width="250px">
+
+
+                <el-form-item label="员工姓名" maxlength="10" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bu_username" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bu_sex" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="员工电话" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bu_tel" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="家庭住址" :label-width="formLabelWidth">
+                    <el-input v-model="formOpt.bu_address" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="雇佣时间" :label-width="formLabelWidth">
+                    <el-date-picker v-model="formOpt.bu_hiredate" autocomplete="off"  type="date"
+                                    format="yyyy年MM月dd日" value-format="yyyy-MM-dd"
+                                    placeholder="选择日期" ></el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="角色权限" :label-width="formLabelWidth">
+                        <el-select v-model="formOpt.br_id" placeholder="请选择">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.BR_ID"
+                                    :label="item.BR_NAME"
+                                    :value="item.BR_ID">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button :plain="true" @click="tishi">密码提示</el-button>
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveData">确 定</el-button>
+            </div>
+        </el-dialog>
+    </el-row>
+</div>
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            form:{bu_username:''},
+            currentPage:1,
+            pageSize:2,
+            total:300,
+            title:'1',
+            dialogFormVisible:false,
+            formLabelWidth:"120px",
+            formOpt:{bu_id:0,bu_username:"",bu_password:'',bu_sex:"",bu_tel:'',bu_address:"",bu_hiredate:"",br_id:0,bu_name:""},
+            requestURL:'',
+            options:[]
+        },
+        created: function () {
+            this.loadData();
+            var self =this;
+            //动态取出所有的部门
+            axios.get('/user/roleList')
+                .then(function (response) {
+                    self.options =response.data;
+                });
+        },
+        methods:{
+            tishi() {
+                this.$message('密码是手机号后六位');
+            },
+            search:function(){
+                this.currentPage=1;
+                this.loadData();
+            },
+            //初始化加载数据
+            loadData:function(){
+                var self = this;//代表Vue对象
+                //计算开始值
+                var start = (this.currentPage-1)*this.pageSize;
+                //计算结束值
+                var end =this.currentPage*this.pageSize+1;
+                //self.form.push("start",start);
+                //self.form.push("end",end);
+                var searchForm ={"start":start,"end":end,"bu_username":this.form.bu_username};
+                axios.post('/user/page',searchForm).then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data.pageList;
+                    self.total=response.data.pageCount;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            //分页处理的函数
+            handleSizeChange:function(val) {//每页显示数量改变时触发
+                console.log("每页"+val+"条");
+                this.pageSize=val;
+                this.loadData();
+            },
+            handleCurrentChange:function(val) {//第几页发生变化时触发
+                console.log("当前页: "+val);
+                this.currentPage=val;
+                this.loadData();
+            },
+            handleDelete:function(index, row) {
+                //console.log(index, row);
+                var self =this;
+                this.$confirm('此操作将永久删除该条信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(function(){
+                    axios.get('/user/deleteUser?bu_id='+row.bu_id)
+                        .then(function (response) {
+                            // handle success
+                            console.log(response);
+                            if(response.data=='1'){
+                                self.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                                self.loadData();
+                            }else{
+                                self.$message({
+                                    type: 'error',
+                                    message: '删除失败!'
+                                });
+                            }
+                        })
+                }).catch(function() {
+                    self.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            handleEdit:function(index, row) {
+                console.log(JSON.stringify(row));
+                this.title = "员工编辑";
+                this.requestURL = "/user/updateUser";
+                this.formOpt = row;
+                console.log(row)
+                this.dialogFormVisible = true;
+            },
+            handleAdd:function() {
+                this.formOpt={};
+                this.title="员工添加";
+                this.requestURL="/user/saveUser";
+                this.dialogFormVisible=true;
+            },
+            saveData:function() {
+
+                var tel=this.formOpt.bu_tel;
+                if(this.formOpt.bu_id==0){
+                    this.formOpt.bu_password=tel.substring(5);
+                }
+                var self = this;
+                axios.post(this.requestURL, this.formOpt
+                ).then(function (response) {
+                    if (response.data == '1') {
+                        self.$message({
+                            message: '恭喜你， 操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出form
+                        self.dialogFormVisible = false;
+                        //重新加载数据
+                        self.loadData();
+                    } else {
+                        self.$message.error('错了哦');
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

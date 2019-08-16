@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <!--页面框架样式-->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/components.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/main.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/new-home.css?ver=142682356" rel="stylesheet" />
+    <!--页面框架样式-->
+
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+        .el-aside {
+            color: #333;
+        }
+    </style>
+
+    <!--去除超链接的下划线样式-->
+    <style type="text/css">a {text-decoration: none}</style>
+    <script src="/js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div class="wrapper login">
+
+    <!--引入头部-->
+    <div id="head"></div>
+    <!--引入头部-->
+
+    <div id="app">
+        <!--主体部分开始-->
+        <el-container style="height: 600px; border-left: 430px solid #eee;width:1500px">
+            <!--侧边栏容器开始-->
+            <el-aside width="200px" >
+                <!--菜单导航栏-->
+                <el-menu>
+                    <el-menu-item-group><h3>个人中心</h3></el-menu-item-group>
+
+                    <!--个人信息-->
+                    <a href="GInformation.html"><el-menu-item >个人信息</el-menu-item></a>
+
+
+                    <!--借款业务-->
+                    <a href="MLoans.html"><el-menu-item >借款业务</el-menu-item></a>
+
+                    <!--还款业务-->
+                    <a href="Mfund.html"><el-menu-item >还款业务</el-menu-item></a>
+
+                    <!--还款记录-->
+                    <a href="MfundNotes.html"><el-menu-item >还款记录</el-menu-item></a>
+
+                    <!--充值提现-->
+                    <a href="MRefund.html"><el-menu-item >充值提现</el-menu-item></a>
+
+                    <!--消息提示-->
+                    <a href="MNotification.html"><el-menu-item >消息提示</el-menu-item></a>
+
+                    <!--账号设置-->
+                    <a href="MAccountSecurity.html"><el-menu-item >账号安全</el-menu-item></a>
+
+                </el-menu>
+            </el-aside>
+
+            <el-container>
+                <!--头部栏容器-->
+                <el-header>充值提现</el-header>
+
+                <!--主要区域容器开始-->
+                <el-main>
+
+                    <template>
+                        <el-tabs v-model="activeName2" type="card" @tab-click="handleClick">
+                            <!--充值业务-->
+
+                            <el-tab-pane label="充值" name="first">
+                                <el-form ref="form" :model="payForm2" label-width="80px" size=" small">
+                                    <el-form-item label="公司编号" style="display: none">
+                                        <el-input  style="width: 180px;" prop="bci_id" v-model="payForm2.bci_id" readonly="readonly"></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="账户余额">
+                                        <el-input  style="width: 180px;" prop="money" v-model="payForm2.money" readonly="readonly"></el-input>
+                                    </el-form-item>
+
+                                    <!--<el-form-item label="用户金额">-->
+                                        <!--<el-input  style="width: 180px;" prop="user_money" v-model="payForm2.user_money" readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <el-form-item label="充值金额">
+                                        <el-input  style="width: 180px;" prop="ba_money" v-model="payForm2.ba_money" ></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item  label="交易密码">
+                                        <el-input style="width: 180px;"type="password"prop="deal"v-model="payForm2.deal"></el-input>
+                                    </el-form-item>
+                                    <el-form-item size="large">
+                                        <el-button type="primary" @click="toSubmit">充值</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </el-tab-pane>
+                            <!--提现业务-->
+                            <el-tab-pane label="提现" name="second">
+                                <el-form ref="form" :model="payForm3" label-width="80px" size=" small">
+                                    <el-form-item label="公司编号" style="display: none">
+                                        <el-input  style="width: 180px;" prop="bci_id" v-model="payForm3.bci_id" readonly="readonly"></el-input>
+                                    </el-form-item>
+
+
+                                    <el-form-item label="提现金额">
+                                        <el-input  style="width: 180px;" prop="bci_money" v-model="payForm3.bci_money" ></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="银行卡号">
+                                        <el-input style="width: 180px;" prop="bci_bankcard" v-model="payForm3.bci_bankcard"></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item  label="交易密码">
+                                        <el-input style="width: 180px;"type="password"prop="deal"v-model="payForm3.deal"></el-input>
+                                    </el-form-item>
+                                    <el-form-item size="large">
+                                        <el-button type="primary" @click="forSubmit">提现</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </el-tab-pane>
+                            <!--还款业务-->
+                            <!--<el-tab-pane label="还款业务" name="first">-->
+                                <!--<el-form ref="form" :model="payForm" label-width="80px" size=" small">-->
+                                    <!--<el-form-item label="公司编号" style="display: none">-->
+                                        <!--<el-input  style="width: 180px;" prop="bci_id" v-model="payForm.bci_id" readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <!--<el-form-item label="初始贷款">-->
+                                        <!--<el-input style="width: 180px;" prop="bli_money" v-model="payForm.bli_money"readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <!--<el-form-item label="需还款">-->
+                                        <!--<el-input style="width: 180px;" prop="bri_remoney" v-model="payForm.bri_remoney"readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+                                    <!--<el-form-item label="利率">-->
+                                        <!--<el-input  style="width: 180px;" prop="bli_rate" v-model="payForm.bli_rate" readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <!--<el-form-item label="银行卡号">-->
+                                        <!--<el-input style="width: 180px;" prop="bci_bankcard" v-model="payForm.bci_bankcard" readonly="readonly"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <!--<el-form-item  label="交易密码">-->
+                                        <!--<el-input style="width: 180px;"type="password"prop="bci_deal" v-model="payForm.bci_deal"></el-input>-->
+                                    <!--</el-form-item>-->
+
+                                    <!--<el-form-item size="large">-->
+                                        <!--<el-button type="primary" @click="onSubmit">还款</el-button>-->
+                                    <!--</el-form-item>-->
+                                <!--</el-form>-->
+                            <!--</el-tab-pane>-->
+
+                        </el-tabs>
+                    </template>
+                </el-main>
+            </el-container>
+        </el-container>
+        <!--主体部分结束-->
+    </div>
+
+    <!--引入底部-->
+    <div id="last"></div>
+    <!--引入底部-->
+
+</div>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data:{
+            payForm: {
+            bli_money:"",
+            bci_deal:"",
+            bri_remoney:"",
+            bci_id:""
+        },
+            payForm2:{
+                bci_id:"",
+                money:"",
+                user_money:"",
+                ba_money:"",
+                bci_bankcard:"",
+                deal:""
+            },
+            payForm3:{
+                bci_id:"",
+                bci_money:"",
+                bci_bankcard:"",
+                deal:""
+            },
+            activeName2: 'first'
+        },
+        created: function () {
+            this.loadData();
+        },
+        methods: {
+            loadData: function () {
+                var self = this;//代表Vue对象
+                axios.post('/remo/list').then(function (response) {
+
+                    console.log(response.data[0].BCI_ID);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+//                    self.payForm.bli_rate = response.data[0].BLI_RATE;
+//                    self.payForm.bli_money = response.data[0].BLI_MONEY;
+//                    self.payForm.bci_id = response.data[0].BCI_ID;
+
+//                    self.payForm.bci_deal = response.data[0].BCI_DEAL;
+//                    self.payForm.bri_remoney = (response.data[0].BLI_MONEY * response.data[0].BLI_RATE)+response.data[0].BLI_MONEY;
+
+                    self.payForm2.bci_bankcard = response.data[0].BCI_BANKCARD;
+                    self.payForm2.bci_id = response.data[0].BCI_ID;
+                    self.payForm2.money = response.data[0].BCI_MONEY;
+                    self.payForm2.user_money = response.data[0].BA_MONEY;
+
+
+                    self.payForm3.bci_id = response.data[0].BCI_ID;
+                    self.payForm3.bci_bankcard = response.data[0].BCI_BANKCARD;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+                /* this.payForm.bci_id=row.BCI_id;*/
+            },
+            handleClick: function (tab, event) {
+                console.log(tab, event);
+            },
+            toSubmit: function () {
+                var self=this;
+                axios.post("/remo/toUpdate",self.payForm2
+                ).then(function (response) {
+                    if(response.data==1){
+                        self.$message({
+                            message: '恭喜你， 操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出form
+                        self.dialogFormVisible=false;
+                        //重新加载数据
+                        self.loadData();
+                        window.location = "/front/GInformation.html";
+                    }else if (response.data==2){
+                        self.$message.error('对不起，您一次最多充值八万');
+                    }else {
+                        self.$message.error('操作失败');
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            forSubmit: function () {
+                var self=this;
+                axios.post("/remo/forUpdate",self.payForm3
+                ).then(function (response) {
+                    if(response.data==2){
+                        self.$message({
+                            message: '恭喜你， 操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出form
+                        self.dialogFormVisible=false;
+                        //重新加载数据
+                        self.loadData();
+                        window.location = "/front/GInformation.html";
+                    }else if(response.data==1){
+                        self.$message.error('金额不足，无法提现');
+                    }else {
+                        self.$message.error('操作失败');
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            onSubmit: function () {
+                var self=this;
+                axios.post("/remo/onUpdate",self.payForm
+                ).then(function (response) {
+                    self.payForm.bri_remoney=0;
+                    if(response.data==3){
+                        self.$message({
+                            message: '恭喜你， 操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出form
+                        self.dialogFormVisible=false;
+                        //重新加载数据
+//                        self.loadData();
+//					}else if (response.data='0'){
+//						self.$message.error('您已提交过申请');
+//					}else if (response.data='1'){
+//                        self.$message.error('请先登录');
+                    }else {
+                        self.$message.error('操作失败');
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+
+            pickerOptions1: {
+                disabledDate(time) {
+                    return time.getTime() > Date.now();
+                },
+                shortcuts: [{
+                    text: '今天',
+                    onClick(picker) {
+                        picker.$emit('pick', new Date());
+                    }
+                }, {
+                    text: '昨天',
+                    onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24);
+                        picker.$emit('pick', date);
+                    }
+                }, {
+                    text: '一周前',
+                    onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', date);
+                    }
+                }]
+            },
+        },
+
+            value2: '',
+            value1: '',
+
+    })
+</script>
+</body>
+</html>
+
+<!--引入外部页面-->
+<script>
+    $("#head").load("head.html");
+    $("#last").load("last.html");
+</script>
+<!--引入外部页面-->

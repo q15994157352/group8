@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>通过历史</title>
+    <!--<script src="js/vue.js"></script>-->
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+        <el-table
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="bp_id"
+                    label="通过编号"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="ba_zhanghao"
+                    label="用户姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bu_username"
+                    label="管理员"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bci_id"
+                    label="公司id"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bci_name"
+                    label="公司名称"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="passtime"
+                    label="通过时间"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="bp_state"
+                    label="通过阶段"
+                    :formatter="formatter"
+                    width="180">
+            </el-table-column>
+        </el-table>
+    </el-row>
+    <el-row>
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[2,3,10,15]"
+                :page-size="6"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+        </el-pagination>
+    </el-row>
+</div>
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            form:{empNo:'',job:'',deptNo:''},
+            currentPage:1,
+            pageSize:6,
+            total:300,
+            title:'1',
+            dialogFormVisible:false,
+            formLabelWidth:"120px",
+            formOpt:{bp_id:0,bci_name:"",bp_state:0,bci_id:0},
+            requestURL:'',
+            options:[],
+        },
+        created: function () {
+            this.loadData();
+        },
+
+        methods: {
+            loadData: function () {
+                var self = this;//代表Vue对象
+                //计算开始值
+                var start = (this.currentPage - 1) * this.pageSize;
+                //计算结束值
+                var end = this.currentPage * this.pageSize + 1;
+                //self.form.push("start",start);
+                //self.form.push("end",end);
+                var searchForm = {"start": start, "end": end};
+                axios.post('/pageD', searchForm).then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data.borrowMonies;
+                    self.total = response.data.getbePagingMap;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            handleSizeChange: function (val) {//每页显示数量改变时触发
+                console.log("每页" + val + "条");
+                this.pageSize = val;
+                this.loadData();
+            },
+            handleCurrentChange: function (val) {//第几页发生变化时触发
+                console.log("当前页: " + val);
+                this.currentPage = val;
+                this.loadData();
+            },
+            handleEdit: function (index, row) {
+                this.title = "详细信息";
+                this.requestURL = "/rejectList";
+                this.formOpt = row;
+                this.dialogFormVisible = true;
+                console.log(index, row);
+
+            },
+            formatter: function (row, bp_state) {
+                var msg = "";
+                if (row.bp_state == 1) {
+                    msg = "公司审核通过";
+                }else if(row.bp_state == 2){
+                    msg = "贷款请求通过";
+                }
+                return msg;
+            }
+        }
+    });
+</script>
+</body>
+</html>

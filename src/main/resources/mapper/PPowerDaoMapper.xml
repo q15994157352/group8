@@ -1,0 +1,47 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.PPowerDao">
+    <select id="getList" resultType="com.aaa.group8.entity.TreeNode">
+       select bl_id,bl_name label,bl_parentid as bl_parentId,url from btb_limit
+    </select>
+
+    <select id="getLists" resultType="com.aaa.group8.entity.TreeNode">
+        select distinct bl.bl_id,bl.bl_name as label,bl.bl_parentid as bl_parentId,bl.url from btb_limit bl
+            inner join btb_role_limit brl on brl.bl_id = bl.bl_id
+            inner join btb_role br on br.br_id=brl.br_id
+            inner join btb_user bu on bu.br_id = br.br_id
+            <where>
+                <if test="BU_ID!=null and BU_ID!=0">
+                    bu.bu_id =#{BU_ID}
+                </if>
+            </where>
+    </select>
+    <!--<select id="getPowerTreeData" resultType="com.aaa.group8.entity.TreeNode">-->
+    <!--select distinct l.bl_id, l.bl_name as label,l.bl_parentid,l.bl_url as url from btb_user u-->
+    <!--inner join btb_user_role ur on u.bu_id=ur.bu_id-->
+    <!--inner join btb_role r on r.br_id=ur.br_id-->
+    <!--inner join btb_role_limit rl on r.br_id=rl.br_id-->
+    <!--inner join btb_limit l on l.bl_id=rl.bl_id-->
+    <!--where u.bu_id=#{BU_ID}-->
+    <!--</select>-->
+    <!--<select id="toLogin" resultType="int">-->
+    <!--SELECT  count(1) from btb_user where bu_username=#{username} and bu_password=#{password}-->
+    <!--</select>-->
+
+    <select id="toLogin" resultType="map">
+        SELECT  * from btb_user where bu_username=#{username} and bu_password=#{password}
+    </select>
+
+    <select id="getById" resultType="com.aaa.group8.entity.TreeNode">
+        select bl_id,bl_name as label, bl_parentId,url from btb_limit where bl_id=#{nodeId}
+    </select>
+    <insert id="savePower">
+        INSERT into btb_limit VALUES (SEQ_BTB_LIMIT_bl_id.nextval,#{label},#{bl_parentId},#{url})
+    </insert>
+    <update id="updatePower">
+        UPDATE btb_limit set bl_name=#{label}, bl_parentId=#{bl_parentId},url=#{url} where bl_id=#{bl_id}
+    </update>
+    <delete id="deletePower">
+        DELETE  from btb_limit where bl_id=#{nodeId}
+    </delete>
+</mapper>

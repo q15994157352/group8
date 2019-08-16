@@ -1,0 +1,49 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.GInformationDAO">
+    <!--用户个人信息-->
+    <select id="listMation" resultType="map">
+        select distinct ba.BA_ID,ba.BA_ZHANGHAO,bc.BCI_MONEY,bl.BLI_MONEY,be.BXI_INSTALMENT
+        from BTB_ADMIN ba
+        inner join BTB_COMPANYINFO bc on ba.BA_ID=bc.BA_ID
+        inner join BTB_XMIT BX on bc.BCI_ID=bx.BCI_ID
+        inner join BTB_EMIT be on be.BCI_ID=bc.BCI_ID
+        inner join BTB_LOANSINFO bl on bl.BCI_ID=bc.BCI_ID
+        where be.BXI_STATUS=1 and ba.BA_ID=#{baid}
+    </select>
+
+    <!--用户已还金额信息-->
+    <select id="listmoney" resultType="map">
+         select sum(be.BXI_MONEY) as money
+         from BTB_EMIT be
+         inner join BTB_COMPANYINFO bc on bc.BCI_ID=be.BCI_ID
+         inner join BTB_ADMIN ba on ba.BA_ID=bc.BA_ID
+         where be.BXI_STATUS=1 and ba.BA_ID=#{baid}
+    </select>
+
+    <!--用户未还金额信息-->
+    <select id="notmoney" resultType="map">
+        select sum(be.BXI_MONEY) as notmoney
+        from BTB_EMIT be
+        inner join BTB_COMPANYINFO bc on bc.BCI_ID=be.BCI_ID
+        inner join BTB_ADMIN ba on ba.BA_ID=bc.BA_ID
+        where be.BXI_STATUS=0 and ba.BA_ID=#{baid}
+    </select>
+
+    <!--查询用户的状态信息-->
+    <select id="isstatus" resultType="int">
+        select sum(be.BXI_STATUS) as isstatus
+        from BTB_EMIT be
+        inner join BTB_COMPANYINFO bc on bc.BCI_ID=be.BCI_ID
+        inner join BTB_ADMIN ba on ba.BA_ID=bc.BA_ID
+        where ba.BA_ID=#{baid}
+    </select>
+
+    <!--查询借款金额-->
+    <select id="loanmoney" resultType="map">
+        select distinct bl.BLI_MONEY,bc.BCI_MONEY from BTB_ADMIN ba
+        inner join BTB_COMPANYINFO bc on ba.BA_ID=bc.BA_ID
+        inner join BTB_LOANSINFO bl on bl.BCI_ID=bc.BCI_ID
+        where ba.BA_ID=#{baid}
+    </select>
+</mapper>

@@ -1,0 +1,50 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.PBackstageUserDao">
+    <select id="getListByParam" resultType="user">
+        SELECT bu_id,bu_username,bu_sex,bu_tel,bu_address,to_char(bu.bu_hiredate,'yyyy-mm-dd')as
+        hiredate from BTB_USER
+        <where>
+            <if test="bu_username!=null and bu_username !=0">
+                and bu_username =#{bu_username}
+            </if>
+        </where>
+    </select>
+    <select id="getPageByParam" resultType="user">
+        SELECT bu_id, bu_username, bu_sex,bu_tel,bu_address,bu_hiredate,br_id,br_name from
+        (SELECT rownum rn, bu.bu_id,bu.bu_username,bu.bu_sex,bu.bu_tel,bu_address,to_char(bu.bu_hiredate,'yyyy-mm-dd')as
+        bu_hiredate,br.br_id,br.br_name from btb_role br inner join btb_user bu on bu.br_id = br.br_id
+        <where>
+            <if test="bu_username!=null and bu_username !=''">
+                bu_username =#{bu_username}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) a where a.rn &gt; #{start}
+    </select>
+    <!--根据参数查询分页总数量，如果参数为空，查询全部-->
+    <select id="getPageCount" resultType="int">
+        select count(*) from btb_user
+        <where>
+            <if test="bu_username!=null and bu_username !=''">
+                and bu_username =#{bu_username}
+            </if>
+        </where>
+    </select>
+    <insert id="save">
+       INSERT  into btb_user values(seq_btb_user_bu_id.nextval,#{bu_username},#{bu_password},#{bu_sex},#{bu_tel},#{bu_address},to_date(#{bu_hiredate},'yyyy-mm-dd'),#{br_id})
+   </insert>
+    <update id="update">
+        update btb_user set bu_username = #{bu_username},bu_sex=#{bu_sex},bu_tel=#{bu_tel},bu_address=#{bu_address},bu_hiredate=to_date(#{bu_hiredate},'yyyy-mm-dd'),
+       br_id=#{br_id}  where bu_id = #{bu_id}
+    </update>
+    <delete id="delete">
+        delete from btb_user where bu_id= #{bu_id}
+    </delete>
+    <select id="getAllRole" resultType="map">
+        select br_id,br_name from btb_role
+    </select>
+
+</mapper>

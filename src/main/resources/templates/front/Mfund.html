@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--页面框架样式-->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/components.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/main.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/new-home.css?ver=142682356" rel="stylesheet" />
+    <!--页面框架样式-->
+    <script src="/js/jquery-1.11.0.min.js"></script>
+
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+        .el-aside {
+            color: #333;
+        }
+    </style>
+
+    <!--去除超链接的下划线样式-->
+    <style type="text/css">a {text-decoration: none}</style>
+
+</head>
+<body>
+<div class="wrapper login">
+
+    <!--引入头部-->
+    <div id="head"></div>
+    <!--引入头部-->
+
+    <!--主体部分开始-->
+    <div id="app">
+        <el-container style="height: 600px; border-left: 430px solid #eee;width: 1500px">
+            <!--侧边栏容器开始-->
+            <el-aside width="200px">
+                <!--菜单导航栏-->
+                <el-menu>
+                    <el-menu-item-group><h3>个人中心</h3></el-menu-item-group>
+
+                    <!--个人信息-->
+                    <a href="GInformation.html"><el-menu-item >个人信息</el-menu-item></a>
+
+
+                    <!--借款业务-->
+                    <a href="MLoans.html"><el-menu-item >借款业务</el-menu-item></a>
+
+                    <!--还款业务-->
+                    <a href="Mfund.html"><el-menu-item >还款业务</el-menu-item></a>
+
+                    <!--还款记录-->
+                    <a href="MfundNotes.html"><el-menu-item >还款记录</el-menu-item></a>
+
+                    <!--充值提现-->
+                    <a href="MRefund.html"><el-menu-item >充值提现</el-menu-item></a>
+
+
+
+                    <!--消息提示-->
+                    <a href="MNotification.html"><el-menu-item >消息提示</el-menu-item></a>
+
+                    <!--账号设置-->
+                    <a href="MAccountSecurity.html"><el-menu-item >账号安全</el-menu-item></a>
+                </el-menu>
+            </el-aside>
+
+            <el-container>
+                <!--头部栏容器-->
+                <el-header>还款业务</el-header>
+                <!--主要区域容器开始-->
+                <el-main>
+
+                    <el-row>
+                        <el-table
+                                :data="tableData"
+                                style="width: 100%;margin: auto"
+                                max-height="700">
+                            <el-table-column
+                            style="display: none"
+                            prop="BCI_ID"
+                            label="公司编号"
+                            width="80">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="BCI_NAME"
+                                    label="公司名称"
+                                    width="110">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="TIME"
+                                    label="应还款日期"
+                                    width="130">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="BLI_MONEY"
+                                    label="贷款金额"
+                                    width="80">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="BXI_MONEY"
+                                    label="每期还款金额"
+                                    width="105">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="BXI_MONTH"
+                                    label="期数"
+                                    width="70">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="BXI_INSTALMENT"
+                                    label="总期数"
+                                    width="70">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="BXI_STATUS"
+                                    label="状态"
+                                    width="70"
+                                    :formatter="formatStatus">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="right"
+                                    label="操作"
+                                    width="70"
+                                    :formatter="formatStatus">
+                                <template slot-scope="scope">
+                                    <el-button
+                                            size="mini"
+                                            type="primary"
+                                            @click="saveData(scope.row)">
+                                        还款
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-row>
+
+                </el-main>
+            </el-container>
+        </el-container>
+    </div>
+    <!--主题部分结束-->
+
+    <!--引入底部-->
+    <div id="last"></div>
+    <!--引入底部-->
+</div>
+
+
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+        },
+        created: function () {
+            this.loadData();
+        },
+        methods:{
+            formatStatus:function (row, column) {
+                return row.BXI_STATUS === 0 ? '未还款':'已还款';
+            },
+            loadData:function(){
+                var self = this;//代表Vue对象
+                axios.post('/deal/list').then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    self.tableData = response.data;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }, saveData:function(row){
+                    var self=this;
+//                    alert(JSON.stringify(this.tableData));
+                    axios.post('/deal/save',row).then(function (response) {
+                        if(response.data=='5'){
+                            self.$message({
+                                message: '恭喜你， 操作成功',
+                                type: 'success'
+                            });
+                            //关闭弹出form
+                            self.dialogFormVisible=false;
+                            //重新加载数据
+                            self.loadData();
+                        }else if (response.data=='1'){
+                            self.$message.error('时间未到,不可还款');
+                        }else if (response.data=='2'){
+                            self.$message.error('不能进行此操作');
+                        }else{
+                            self.$message.error('账户余额不足，请先充值');
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        }
+    });
+</script>
+</body>
+</html>
+<!--引入外部页面-->
+<script>
+    $("#head").load("head.html");
+    $("#last").load("last.html");
+</script>
+<!--引入外部页面-->

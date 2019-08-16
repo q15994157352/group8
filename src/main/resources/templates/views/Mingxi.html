@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放款管理</title>
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+    <el-table
+            :data="tableData"
+            style="width: 100%;margin: auto"
+            max-height="700">
+        <el-table-column
+                fixed
+                prop="BCI_NAME"
+                label="公司名称"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BFI_STATUS"
+                label="流水状态"
+                width="150"
+                :formatter="formatStatus">
+        </el-table-column>
+        <el-table-column
+                prop="BFI_INCOM"
+                label="收入金额"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BFI_PAY"
+                label="支出金额"
+                width="150">
+        </el-table-column>
+        <el-table-column
+                prop="BFI_MONEY"
+                label="总资产"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="TIME"
+                label="支出收入日期"
+                width="150">
+        </el-table-column>
+
+    </el-table>
+    </el-row>
+</div>
+</body>
+
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            form:{bci_id:0,bci_name:'',bci_type:'',bci_business:'',bdi_name:'',bdi_sex:'',bdi_tel:0,bli_money:0,blb_name:''},
+            dialogFormVisible:false,
+            formLabelWidth:"90px",
+            requestURL:'',
+            tableData:[]
+        },created: function () {
+            this.loadData();
+        },
+        methods:{
+            formatStatus:function (row, column) {
+                return row.BFI_STATUS === 0 ? '支出':'收入';
+            },
+            loadData:function(){
+                var self = this;//代表Vue对象
+                axios.post('/deal/getThem').then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    })
+</script>
+</html>

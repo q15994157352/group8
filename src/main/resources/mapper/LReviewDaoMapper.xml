@@ -1,0 +1,48 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.LReviewDao">
+
+    <insert id="saveFaren">
+        <selectKey resultType="int" keyProperty="bdi_id" order="BEFORE">
+            select SEQ_BTB_DEPUTYINFO.nextval from dual
+        </selectKey>
+          insert into btb_deputyinfo values(#{bdi_id},#{bci_id},#{bdi_name},#{bdi_sex },#{bdi_tel},#{headPicName1},#{headPicName2},#{headPic1},#{headPic2})
+    </insert>
+
+    <insert id="saveCompany">
+        <selectKey resultType="int" keyProperty="bci_id" order="BEFORE">
+            select SEQ_BTB_COMPANYINFO.nextval from dual
+        </selectKey>
+        insert into btb_companyinfo values(#{bci_id},#{bci_name},#{bci_type},#{bci_bankcard},#{bci_address},#{bci_email},#{bci_business},0,#{headPicName},#{headPic},#{bci_deal},#{ba_id},0)
+    </insert>
+
+
+    <insert id="saveLoan">
+        <selectKey resultType="int" keyProperty="bli_id" order="BEFORE">
+            select SEQ_BTB_LOANSINFO.nextval from dual
+        </selectKey>
+        insert into btb_loansinfo values(#{bli_id},#{bli_money},SYSDATE,0.30,#{bci_id},0,2,#{bli_instalment})
+    </insert>
+
+    <select id="findCompany" resultType="Map">
+        select * from BTB_COMPANYINFO
+         <where>
+             <if test="bci_name != null and bci_name != '' ">
+                 and bci_name = #{bci_name}
+             </if>
+             <if test="bci_type != null and bci_type != '' ">
+                 and bci_type = #{bci_type}
+             </if>
+             <if test="bci_address != null and bci_address != '' ">
+                 and bci_address = #{bci_address}
+             </if>
+             <if test="bci_email != null and bci_email != '' ">
+                 and bci_email = #{bci_email}
+             </if>
+         </where>
+    </select>
+
+    <select id="getInfo" resultType="Map">
+        SELECT  * from BTB_COMPANYINFO where BA_ID=#{ba_id}
+    </select>
+</mapper>

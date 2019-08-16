@@ -1,0 +1,10 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.LEmitDao">
+    <insert id="addEmit">
+        <selectKey resultType="int" keyProperty="bxi_id" order="BEFORE">
+            select SEQ_BTB_EMIT.nextval from dual
+        </selectKey>
+        insert into BTB_EMIT VALUES (#{bxi_id},#{bci_id},#{bci_name},#{bdi_name},#{bxi_money},SYSDATE,#{bxi_month},0,#{bli_instalment},to_date(#{bxi_time},'yyyy-MM-dd'))
+    </insert>
+</mapper>

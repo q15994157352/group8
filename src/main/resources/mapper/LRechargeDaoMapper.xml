@@ -1,0 +1,52 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.LRechargeDao">
+    <select id="getInfo" resultType="Map">
+        SELECT co.bci_id,co.BCI_MONEY,co.bci_deal,co.bci_bankcard,lo.bli_rate,lo.bli_money,ad.BA_MONEY from BTB_COMPANYINFO  co
+           INNER JOIN BTB_ADMIN ad
+           on co.BA_ID=ad.BA_ID
+           INNER JOIN BTB_LOANSINFO lo
+           on co.BCI_ID=lo.BCI_ID
+           where co.ba_id=#{ba_id}
+    </select>
+
+
+    <update id="toUpdate">
+        update BTB_COMPANYINFO set BCI_MONEY=BCI_MONEY + #{ba_money} where  BCI_ID=#{bci_id}
+    </update>
+
+    <select id="findUserMoney" resultType="Map">
+        SELECT  bci_money from BTB_COMPANYINFO WHERE BCI_ID=#{bci_id}
+    </select>
+    <update id="infoUpdate">
+        update BTB_COMPANYINFO set BCI_MONEY=BCI_MONEY - #{bci_money} where  BCI_ID=#{bci_id}
+    </update>
+    <update id="forUpdate">
+        update BTB_ADMIN SET BA_MONEY=BA_MONEY +#{bci_money}
+        WHERE  BA_ID=#{ba_id}
+    </update>
+
+
+    <update id="getUpdate">
+        update BTB_COMPANYINFO set BCI_MONEY=BCI_MONEY - #{bli_money} where  BCI_ID=#{bci_id}
+    </update>
+
+    <update id="myUpdate">
+        update BTB_LOVAL_BANKCARD set BLB_MONEY=BLB_MONEY + #{bli_money} where  BLB_ID=1
+    </update>
+
+    <insert id="myAdd">
+        <selectKey resultType="int" keyProperty="bri_id" order="BEFORE">
+            select SEQ_BTB_REFUNDINFO.nextval from dual
+        </selectKey>
+        insert into BTB_REFUNDINFO VALUES (#{bri_id},#{bri_remoney},SYSDATE,1,#{bci_id})
+    </insert>
+
+    <select id="getListAll" resultType="Map">
+        SELECT co.BCI_NAME,co.BCI_BUSINESS,do.BDI_NAME,do.BDI_TEL,ro.BRI_REMONEY  from BTB_REFUNDINFO ro inner JOIN BTB_COMPANYINFO co
+        on co.BCI_ID=ro.BCI_ID
+        INNER  JOIN BTB_DEPUTYINFO do
+        ON co.BCI_ID=do.BCI_ID
+        where ro.BRI_STATUS=1
+    </select>
+</mapper>

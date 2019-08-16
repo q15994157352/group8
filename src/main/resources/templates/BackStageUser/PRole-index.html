@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>角色管理</title>
+		<!--先引入vue.js库-->
+		<script src="/vue/vue.js"></script>
+		<!--axios.min.js-->
+		<script src="/vue/axios.min.js"></script>
+		<!-- 引入样式 -->
+		<link rel="stylesheet" href="/element/index.css">
+		<!-- 引入组件库 -->
+		<script src="/element/index.js"></script>
+		<style>
+			.el-header, .el-footer {
+				background-color: #B3C0D1;
+				color: #333;
+				text-align: center;
+				line-height: 60px;
+			}
+			.el-aside {
+				color: #333;
+				text-align: center;
+				line-height: 26px;
+				height: 650px;
+			}
+
+			.el-main {
+				background-color: #E9EEF3;
+				color: #333;
+				text-align: center;
+				line-height: 26px;
+			}
+
+			body > .el-container {
+				margin-bottom: 40px;
+			}
+
+			.el-container:nth-child(5) .el-aside,
+			.el-container:nth-child(6) .el-aside {
+				line-height: 260px;
+			}
+
+			.el-container:nth-child(7) .el-aside {
+				line-height: 320px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+
+			<el-container>
+
+					<el-aside width="200px">
+						<el-tree :data="treeData" default-expand-all   @node-click="handleNodeClick"></el-tree>
+					</el-aside>
+						<el-main>
+							<el-form ref="form" :model="form" label-width="80px">
+								<el-form-item label="角色id" v-if="idIsShow">
+									<el-input  v-model="form.br_id" style="width: 120px;" :readonly="true"></el-input>
+								</el-form-item>
+								<el-form-item label="角色名称">
+									<el-input v-model="form.label" style="width: 120px;"></el-input>
+								</el-form-item>
+								<el-form-item label="父节点">
+									<el-input v-model="form.parentName" @focus="onSelectParentNode" style="width: 120px;" :readonly="true"></el-input>
+									<el-input v-model="form.br_parentId"   type="hidden"></el-input>
+								</el-form-item>
+								<el-form-item label="权限">
+									<el-button type="primary" @click="showPowers">拥有权限</el-button>
+								</el-form-item>
+								<el-form-item>
+									<el-button type="primary" @click="onSubmit">{{form.submitBtn}}</el-button>
+									<el-button type="danger" @click="del">删除</el-button>
+								</el-form-item>
+							</el-form>
+						</el-main>
+
+			</el-container>
+			<el-dialog title="角色树" :visible.sync="dialogFormVisible">
+				<el-tree :data="treeData" default-expand-all ref="tree"
+						 show-checkbox
+						 check-strictly="true"
+						 @check-change="handleClick"
+				></el-tree>
+				<div slot="footer" class="dialog-footer">
+					<el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+				</div>
+			</el-dialog>
+			<el-dialog title="权限树" :visible.sync="dialogPowerFormVisible">
+				<el-tree :data="powerTreeData"
+						 default-expand-all
+						 ref="tree"
+						 show-checkbox
+						 node-key="bl_id"
+						 :default-checked-keys="checkedKeys"
+						 @check-change="handlePowerTreeClick"
+				></el-tree>
+				<div slot="footer" class="dialog-footer">
+					<el-button type="primary" @click="dialogPowerFormVisible = false">确 定</el-button>
+				</div>
+			</el-dialog>
+	    </div>
+	    <script>
+	    	var vue =new Vue({
+	    		el:"#app",
+	    		data:{
+                    powerTreeData:[],
+                    treeData:[],
+                    checkedKeys:[],
+                    form: {
+                        br_id:0,
+                        label:'',
+                        br_parentId:0,
+                        parentName:'根节点',
+                        url:'',
+                        submitBtn:'添加'
+                    },
+                    dialogFormVisible:false,
+					idIsShow:false,
+                    dialogPowerFormVisible:false
+	    		},
+				created:function(){
+                    var self=this;
+					axios.post("/role/tree", this.form)
+						.then(function (response) {
+							 self.treeData=response.data;
+						})
+                    axios.post("/treeList", this.form)
+                        .then(function (response) {
+                            self.powerTreeData=response.data.powerList;
+                            console.log(JSON.stringify(response.data))
+                        })
+				},
+                methods: {
+                    handleNodeClick: function (data) {
+                        //  alert(data.id+"......"+data.parentName);
+                          var _this=this;
+                        if (data.br_id != null && data.br_id != 'null' && data.br_id != '' && data.br_id != 'undefined') {
+                          //console.log(JSON.stringify(data));
+                            this.form=data;
+                            this.idIsShow=true;
+                            this.form.submitBtn='修改';
+                            _this.checkedKeys=[];
+
+                            axios.post("/treeList", this.form)
+                                .then(function (response) {
+                                    _this.powerTreeData=response.data.powerList;
+                                    axios.post("/role/getPowersByRoleId?roleId="+data.br_id)
+                                        .then(function (response) {
+                                            console.log(JSON.stringify(data.br_id))
+                                            //alert(response.data);
+//                                            alert(JSON.stringify(response.data));
+                                            _this.checkedKeys=response.data;
+                                        })
+                                })
+
+                        }
+                    }, handleClick:function(data, checked, node){
+                        if(checked == true){
+                            //this.checkedId = data.br_id;
+                            this.form.br_parentId=data.br_id;
+                            this.form.parentName=data.label;
+                            this.$refs.tree.setCheckedNodes([data]);
+                        }
+                    },
+                    getChecked:function(){
+                        var nodes =  this.$refs.tree.getCheckedNodes();
+                        this.form.br_parentId=nodes[0].br_id;
+                        //console.log(this.$refs.tree.getCheckedNodes())
+                    },
+                    onSelectParentNode:function(){
+                        this.dialogFormVisible=true;
+					},
+                    onSubmit:function(){
+                         var reqUrl="";
+                        if(this.idIsShow){
+                            reqUrl="/role/update";
+						}else{
+                            reqUrl="/role/save";
+						}
+						var _this=this;
+                        axios.post(reqUrl, this.form)
+                            .then(function (response) {
+                                if(response.data>0){
+                                    _this.$message({
+                                        message: '恭喜你， 操作成功',
+                                        type: 'success'
+                                    });
+                                    window.parent.location.reload();
+								}else {
+                                    _this.$message({
+                                        message: '操作失败',
+                                        type: 'danger'
+                                    });
+								}
+                            })
+					},
+                    del:function(){
+                        var _this=this;
+                        if(this.form.br_id==0 ){
+                            this.$message.error(' 该节点id为空,不能删除');
+						}else{
+                            this.$confirm('此操作将永久删除该条数据, 是否继续?', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(function() {
+                                axios.post("/role/delete?id="+_this.form.br_id)
+                                    .then(function (response) {
+                                        if(response.data==1){
+                                            _this.$message({
+                                                message: '恭喜你， 操作成功',
+                                                type: 'success'
+                                            });
+                                            window.parent.location.reload();
+                                        }else {
+                                            _this.$message({
+                                                message: '操作失败',
+                                                type: 'danger'
+                                            });
+                                        }
+                                    })
+
+                            }).catch(function() {
+                                _this.$message({
+                                    type: 'info',
+                                    message: '已取消删除'
+                                });
+                            });
+
+						}
+					},
+                    showPowers:function(){
+                        this.dialogPowerFormVisible=true;
+					},
+                    handlePowerTreeClick:function(){
+                        //console.log(this.$refs.tree.getCheckedKeys());
+                        var nodes = this.$refs.tree.getCheckedKeys()+"";
+                        var tnodes = nodes.replace("[").replace("]").replace(" ");
+                        //console.log(tnodes);
+                        this.form.url=tnodes;
+					}
+                }
+	    	});
+	    </script>
+	</body>
+</html>

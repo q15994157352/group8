@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>登录账号-login.html</title>
+    <!--页面框架样式-->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/components.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/main.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/new-home.css?ver=142682356" rel="stylesheet" />
+    <!--页面框架样式-->
+
+    <script src="/js/jquery-1.11.0.min.js"></script>
+
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+</head>
+<body>
+<div class="wrapper ">
+
+<!--header-->
+<header class="sl-header new-header ng-scope" ng-controller="HeaderCtrl" id="sl-header">
+    <nav class="navbar navbar-inverse navbar-static-top site-nav " role="navigation">
+        <div class="container new-home-container">
+            <ul class="nav navbar-nav site-nav-sns ">
+                <li> <a href="#" class="icon-sns qq">
+                    <div class="social-content">
+                        <p class="social-title">点融网官方QQ群</p>
+                        <p>141444867</p>
+                    </div> </a> </li>
+                <li>
+                    <a href="http://weibo.com/dianrongwang" target="_blank" class="icon-sns weibo" rel="nofollow"></a>
+                </li>
+                <li>
+                    <a href="#" class="icon-sns wechat">
+                    <div class="social-content">
+                        <p class="social-title">扫描关注微信公众号</p>
+                        <p><img src="/images/qr-code.jpg" /></p>
+                    </div>
+                    </a>
+                </li>
+            </ul>
+            <ul id="nonLoginBar" class="nav navbar-nav navbar-right navbar-sm site-nav-login">
+                <li id="login1">
+                    <a id="login-panel" href="login.html" rel="nofollow">登录</a>
+                </li>
+                <li id="out1">
+                    <a id="logout" rel="nofollow">退出</a>
+                </li>
+                <li>
+                    <a id="create-account" href="create.html" class="btn btn-sm" rel="nofollow">注册账户</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right navbar-sm site-nav-user">
+                <li class="dropdown" id="login2">
+                    <a href="GInformation.html" class="dropdown-toggle hoverHeader"  data-toggle="dropdown" data-hover="dropdown">
+                        尊敬的ViP用户：
+                        <!--欢迎新用户-->
+                        <span id="user"  style="color: yellow">
+                        </span>
+                        <b class="caret">
+                        </b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="member_info.html">我的账户</a></li>
+                        <li><a href="#">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--顶部-->
+
+    <!--首部-->
+    <div class="site-menu">
+        <div class="header-navbar-container sl-nav-wrapper header-nav-container">
+            <nav class="navbar navbar-static-top sl-navbar" role="navigation">
+                <div class="container">
+
+                    <!--首部logo-->
+                    <div class="navbar-header  col-xs-2">
+                        <a class="navbar-brand" href="index.html">
+                            <span class="sl-logo">点融网 - DianRong</span>
+                        </a>
+                    </div>
+
+                    <!--首部链接-->
+                    <div class="sl-nav col-xs-10">
+                        <ul class="nav navbar-nav main-menu">
+                            <!--menus-->
+                            <li class="main-link-list">
+                                <a class="main-link" href="index.html">
+                                    <span class="sl-icon-bold-money-bag"></span>
+                                    <span class="main-link-text">首页</span>
+                                </a>
+                            </li>
+                            <li class="main-link-list">
+                                <a class="main-link" href="/front/MLoans.html">
+                                    <span class="sl-icon-bold-money-bag"></span>
+                                    <span class="main-link-text">我要借款</span>
+                                </a>
+                            </li>
+                            <li class="main-link-list">
+                                <a class="main-link" href="/front/MRefund.html">
+                                    <span class="sl-icon-bold-money-bag"></span>
+                                    <span class="main-link-text">我要还款</span>
+                                </a>
+                            </li>
+                            <li class="main-link-list">
+                                <a class="main-link" href="help.html">
+                                    <span class="sl-icon-bold-trend"></span>
+                                    <span class="main-link-text">安全保障</span>
+                                </a>
+                            </li>
+                            <li class="main-link-list">
+                                <a class="main-link" href="about.html">
+                                    <span class="sl-icon-bold-linkman"></span>
+                                    <span class="main-link-text">关于我们</span>
+                                </a>
+                            </li>
+                            <li class="main-link-list phone-contact">
+                                <span class="sl-icon-bold-phone"></span>
+                                <span> 400-921-9218</span>
+                            </li>
+                            <li class="main-link-list contact-bg">
+                                <span class="contact-img"></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--首部链接-->
+                    <!-- /.navbar-collapse -->
+                </div>
+            </nav>
+        </div>
+        <!--secondaryNav-->
+        <!--jumbotron-->
+    </div>
+</header>
+<!--首部-->
+</div>
+</body>
+</html>
+<!--获取用户名-->
+<script>
+    $(function() {
+        var login1=document.getElementById("login1");
+        var login2=document.getElementById("login2");
+        var out1=document.getElementById("out1");
+
+        login1.style.display="block";
+        login2.style.display="none";
+        out1.style.display="none";
+        $.ajax({
+            url: "/admin/sendUserName",
+            dataType: "json",
+            type: "POST",
+            success: function (data) {
+//                取出map中的用户名
+                var name = data.userName;
+//                如果未登录，显示登录按钮
+                if (name!=null && name!==""){
+                    $("#user").text(name);
+                    login1.style.display="none";
+
+                    login2.style.display="block";
+                    out1.style.display="block";
+
+                }
+            }
+        });
+
+        //    退出
+        $("#logout").click(function () {
+
+            $.ajax({
+                url: '/admin/logout',
+                type: 'post',
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    if (data.code == "200") {
+                        location.href = "/front/login.html"
+//
+                    }
+                }
+            })
+
+        })
+    })
+</script>
+
+

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放款管理</title>
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+    <el-table
+            :data="tableData"
+            style="width: 100%;margin: auto"
+            max-height="700">
+        <!--<el-table-column-->
+                <!--fixed-->
+                <!--style="display: none"-->
+                <!--prop="BCI_ID"-->
+                <!--label="公司编号"-->
+                <!--width="150">-->
+        <!--</el-table-column>-->
+        <el-table-column
+                fixed
+                prop="BCI_NAME"
+                label="公司名称"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BCI_BUSINESS"
+                label="工商号"
+                width="150">
+        </el-table-column>
+        <el-table-column
+                prop="BDI_NAME"
+                label="法人姓名"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BDI_TEL"
+                label="联系电话"
+                width="150">
+        </el-table-column>
+        <el-table-column
+                prop="BLI_MONEY"
+                label="贷款金额"
+                width="150">
+        </el-table-column>
+
+        <!--<el-table-column-->
+                <!--prop="BS_ID"-->
+                <!--label="状态"-->
+                <!--width="150"-->
+                <!--style="display: none"-->
+                <!--:formatter="formatStatus">-->
+        <!--</el-table-column>-->
+
+        <el-table-column
+                prop="right"
+                label="状态"
+                width="200">
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleEdit(scope.$index, scope.row)">
+                 已放款
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    </el-row>
+</div>
+</body>
+
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            form:{bci_id:0,bci_name:'',bci_type:'',bci_business:'',bdi_name:'',bdi_sex:'',bdi_tel:0,bli_money:0,blb_name:''},
+            dialogFormVisible:false,
+            formLabelWidth:"90px",
+            requestURL:'',
+            tableData:[]
+        },created: function () {
+            this.loadData();
+        },
+        methods:{
+//            formatStatus:function (row, column) {
+//                return row.BS_ID === 5 ? '已放款':'错误';
+//            },
+            loadData:function(){
+                var self = this;//代表Vue对象
+                axios.post('/loan/getAll').then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.GModifyDAO">
+    <!--查询已用户的信息-->
+    <select id="listAllUser" resultType="map">
+        select ba.ba_id, ba.ba_zhanghao,ba.ba_password,ba.ba_tel,
+        bc.bci_name,bc.bci_deal,bc.bci_business,bc.bci_email,bc.bci_bankcard
+        from btb_admin ba
+        inner join btb_companyinfo bc
+        on ba.BA_ID=bc.BA_ID
+        where ba.BA_ID=#{ba_id}
+    </select>
+
+    <!--update btb_admin set BA_ZHANGHAO='11111',BA_PASSWORD='11111',BA_TEL='11111111' where BA_ID = 63-->
+    <!--去修改用户信息-->
+    <update id="updateuser" parameterType="map">
+        update btb_admin
+        set BA_ZHANGHAO=#{BA_ZHANGHAO},BA_PASSWORD=#{BA_PASSWORD},BA_TEL=#{BA_TEL} where BA_ID=#{BA_ID}
+    </update>
+
+    <!--去修改用户个人详细信息-->
+    <update id="updatecompany" parameterType="map">
+        update btb_companyinfo
+        set BCI_DEAL=#{BCI_DEAL},BCI_EMAIL=#{BCI_EMAIL},BCI_BANKCARD=#{BCI_BANKCARD}
+        where BA_ID=#{BA_ID}
+    </update>
+</mapper>

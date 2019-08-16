@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放款管理</title>
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+    <el-table
+            :data="tableData"
+            style="width: 100%;margin: auto"
+            max-height="700">
+        <!--<el-table-column-->
+                <!--fixed-->
+                <!--style="display: none"-->
+                <!--prop="BCI_ID"-->
+                <!--label="公司编号"-->
+                <!--width="150">-->
+        <!--</el-table-column>-->
+        <el-table-column
+                fixed
+                prop="BCI_NAME"
+                label="公司名称"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BCI_BUSINESS"
+                label="工商号"
+                width="150">
+        </el-table-column>
+        <el-table-column
+                prop="BDI_NAME"
+                label="法人姓名"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BDI_TEL"
+                label="联系电话"
+                width="150">
+        </el-table-column>
+        <el-table-column
+                prop="BLI_MONEY"
+                label="贷款金额"
+                width="150">
+        </el-table-column>
+
+        <el-table-column
+                prop="BS_ID"
+                label="状态"
+                width="150"
+                :formatter="formatStatus">
+        </el-table-column>
+
+        <el-table-column
+                prop="right"
+                label="操作"
+                width="200">
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleEdit(scope.$index, scope.row)">
+                详情
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    </el-row>
+   <el-row>
+    <el-dialog title="详细信息" :visible.sync="dialogFormVisible">
+        <el-form :model="form">
+            <el-form-item label="公司编号" :label-width="formLabelWidth" style="display: none">
+                <el-input v-model="form.bci_id" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="公司名称" :label-width="formLabelWidth">
+                <el-input v-model="form.bci_name" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="公司类型" :label-width="formLabelWidth">
+                <el-input v-model="form.bci_type" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+
+            <el-form-item label="注册号" :label-width="formLabelWidth">
+                <el-input v-model="form.bci_business" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="法人姓名" :label-width="formLabelWidth">
+                <el-input v-model="form.bdi_name" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="法人性别" :label-width="formLabelWidth">
+                <el-input v-model="form.bdi_sex" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="联系电话" :label-width="formLabelWidth">
+                <el-input v-model="form.bdi_tel" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="贷款金额" :label-width="formLabelWidth">
+                <el-input v-model="form.bli_money" autocomplete="off" readonly="readonly"></el-input>
+            </el-form-item>
+
+            <el-form-item label="分期" :label-width="formLabelWidth">
+                <el-input v-model="form.bli_instalment" autocomplete="off" readonly="readonly" :formatter="formatSD"></el-input>
+                <!--<el-select v-model="form.bli_instalment" placeholder="分期" readonly="readonly">-->
+                    <!--<el-option label="3" value="3"></el-option>-->
+                    <!--<el-option label="6" value="6"></el-option>-->
+                    <!--<el-option label="9" value="9"></el-option>-->
+                <!--</el-select>-->
+            </el-form-item>
+
+            <el-form-item label="银行卡号" :label-width="formLabelWidth">
+                <el-select v-model="form.blb_name" placeholder="请选择银行卡">
+                    <el-option label="123456467" value="123456467"></el-option>
+                    <el-option label="987654321" value="987654321"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            <el-button type="primary" @click="saveData">放款</el-button>
+        </div>
+    </el-dialog>
+  </el-row>
+</div>
+</body>
+
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            form:{bci_id:0,bci_name:'',bci_type:'',bci_business:'',bdi_name:'',bdi_sex:'',bdi_tel:0,bli_money:0,bli_instalment:"",blb_name:''},
+            dialogFormVisible:false,
+            formLabelWidth:"90px",
+            requestURL:'',
+            tableData:[]
+        },created: function () {
+            this.loadData();
+        },
+        methods:{
+            formatSD:function (row, column) {
+                return row.bli_instalment == 3 ?  '三期':'';
+                return row.bli_instalment == 6 ?  '六期':'';
+                return row.bli_instalment == 3 ?  '九期':'';
+            },
+            formatStatus:function (row, column) {
+                return row.BS_ID == 3 ? '未放款':'错误';
+
+            },
+            loadData:function(){
+                var self = this;//代表Vue对象
+                axios.post('/loan/list').then(function (response) {
+                    console.log(response);
+                    console.log(response.data);
+                    //获取后台json赋值给tableData
+                    self.tableData = response.data;
+                    //JSON.stringify 把json对象转换为json字符串
+                    //JSON.parse   把son字符串转换为json对象
+                    // var empList = JSON.stringify(response.data);
+                    //console.log(empList);
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+// handleEdit:function(index, row) {
+//                console.log(JSON.stringify(row));
+//                this.title="详情";
+//                this.requestURL="/loan/listAll";
+//                this.form=row;
+//                this.dialogFormVisible=true;
+//                console.log(index, row);
+//            }
+            handleEdit:function (index, row) {
+//                var self = this;//代表Vue对象
+//                axios.post('/loan/listAll',{"BCI_ID":row.BCI_ID}).then(function (response) {
+//                    console.log(response);
+//                    console.log(response.data);
+//                    //获取后台json赋值给tableData
+////                    self.form = response.data;
+//                    //JSON.stringify 把json对象转换为json字符串
+//                    //JSON.parse   把son字符串转换为json对象
+//                    // var empList = JSON.stringify(response.data);
+//                    //console.log(empList);
+//                }).catch(function (error) {
+//                    console.log(error);
+//                });
+//                axios.post('/loan/listAll',{"BCI_ID":row.BCI_ID}).then(function (response) {
+//                    console.log(response);
+//                    console.log(response.data);
+//                    //获取后台json赋值给tableData
+//                    self.tableData = response.data;
+//                    //JSON.stringify 把json对象转换为json字符串
+//                    //JSON.parse   把son字符串转换为json对象
+//                    // var empList = JSON.stringify(response.data);
+//                    //console.log(empList);
+//                }).catch(function (error) {
+//                    console.log(error);
+//                });
+                //this.requestURL="/loan/listAll";
+                this.form.bci_id= row.BCI_ID;
+                this.form.bci_name= row.BCI_NAME;
+                this.form.bci_type = row.BCI_TYPE;
+                this.form.bci_business = row.BCI_BUSINESS;
+                this.form.bdi_name = row.BDI_NAME;
+                this.form.bdi_sex = row.BDI_SEX;
+                this.form.bdi_tel = row.BDI_TEL;
+                this.form.bli_money = row.BLI_MONEY;
+                this.form.bli_instalment=row.BLI_INSTALMENT;
+                this.form.blb_name = row.BLB_NAME;
+                this.dialogFormVisible=true;
+            },
+
+            saveData:function(){
+                var self=this;
+                alert(JSON.stringify(this.form));
+                axios.post('/loan/update',this.form).then(function (response) {
+                    if(response.data=='4'){
+                        self.$message({
+                            message: '恭喜你， 操作成功',
+                            type: 'success'
+                        });
+                        //关闭弹出form
+                        self.dialogFormVisible=false;
+                        //重新加载数据
+                        self.loadData();
+                    }else{
+                        self.$message.error('错了哦');
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.LremoneyDao">
+    <select id="getAll" resultType="Map">
+      SELECT em.BCI_ID,to_char(em.bxi_time,'yyyy-MM-dd') as bxi_time,em.bxi_status,em.bxi_instalment,em.bxi_month,lo.BLI_MONEY,em.bxi_money,em.bdi_name,co.BCI_NAME
+        from BTB_ADMIN ad INNER JOIN  BTB_COMPANYINFO  co
+        ON ad.BA_ID=co.BA_ID
+        INNER join BTB_LOANSINFO lo
+        on co.BCI_ID=lo.BCI_ID
+        INNER JOIN  btb_emit em
+        on co.bci_id=em.bci_id
+        where  ad.BA_ID=#{ba_id}
+    </select>
+
+    <select id="findMoney" resultType="Map">
+        select BCI_MONEY from BTB_COMPANYINFO where BCI_ID=#{bci_id}
+    </select>
+
+    <update id="updateCompanyMoney">
+        UPDATE BTB_COMPANYINFO set BCI_MONEY=BCI_MONEY-#{BXI_MONEY} where BCI_ID=#{BCI_ID}
+    </update>
+
+    <update id="updateBAnkcard">
+        UPDATE BTB_LOVAL_BANKCARD set BLB_MONEY=BLB_MONEY+#{BXI_MONEY} WHERE  BLB_ID=1
+    </update>
+
+    <update id="updateStatus">
+        UPDATE  BTB_EMIT set BXI_STATUS=1 WHERE BCI_ID=#{BCI_ID} and BXI_INSTALMENT=#{BXI_INSTALMENT} AND BXI_MONTH=#{BXI_MONTH}
+    </update>
+
+    <insert id="addRemoney">
+        <selectKey resultType="int" keyProperty="byi_id" order="BEFORE">
+            select SEQ_BTB_XMIT.nextval from dual
+        </selectKey>
+        insert into  btb_xmit VALUES (#{byi_id},#{BCI_ID},SYSDATE,#{BLI_MONEY},#{BXI_MONTH},#{BXI_INSTALMENT},#{BXI_MONEY})
+    </insert>
+
+
+    <select id="getStatus" resultType="Map">
+        SELECT BXI_STATUS from BTB_EMIT where BCI_ID=#{BCI_ID} AND BXI_MONTH=#{BXI_MONTH} AND BXI_INSTALMENT=#{BXI_INSTALMENT}
+    </select>
+
+    <select id="getRemoneyList" resultType="Map">
+        SELECT xm.BCI_ID,co.BCI_NAME,xm.BLI_MONEY,xm.BXI_MONEY,xm.BXI_MONTH,xm.BXI_INSTALMENT,to_char(xm.BYI_DATE,'yyyy-MM-dd') as BYI_DATE from BTB_XMIT xm INNER JOIN  BTB_COMPANYINFO co
+          ON xm.BCI_ID=co.BCI_ID
+          INNER JOIN  BTB_ADMIN ad
+          on co.BA_ID=ad.BA_ID
+         where ad.BA_ID=#{ba_id}
+    </select>
+
+    <insert id="addHu">
+        <selectKey resultType="int" keyProperty="BFI_ID" order="BEFORE">
+            select seq_BTB_FINANCEINFO.nextval from dual
+        </selectKey>
+        insert into BTB_FINANCEINFO VALUES (#{BFI_ID},#{BCI_NAME},1,#{BXI_MONEY},0,#{blb_money},to_date(#{BFI_DATE},'yyyy-MM-dd'),#{ba_id})
+    </insert>
+
+    <select id="getAllMing" resultType="Map">
+        SELECT * from BTB_FINANCEINFO
+    </select>
+</mapper>

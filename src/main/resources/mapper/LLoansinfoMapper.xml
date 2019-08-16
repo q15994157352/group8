@@ -1,0 +1,60 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.LLoansinfoDao">
+
+    <!--查询审核未放款信息 tableData中数据-->
+    <select id="getAllReview" resultType="Map">
+        SELECT  co.bci_id,co.bci_name,co.bci_business,co.bci_type,de.bdi_name,de.bdi_tel,bo.bli_money,de.bdi_sex,bo.BLI_INSTALMENT,
+        bo.bs_id from BTB_LOANSINFO bo
+        inner  join BTB_COMPANYINFO  co
+        on co.bci_id=bo.bci_id
+        inner  join BTB_DEPUTYINFO de
+        on bo.BCI_ID=de.BCI_ID
+        where bo.BS_ID=3
+    </select>
+
+    <!--查询已经放款信息-->
+    <select id="getListAll" resultType="Map">
+       SELECT  co.bci_name,co.bci_business,co.bci_type,de.bdi_name,de.bdi_tel,bo.bli_money,
+        bo.bs_id from BTB_LOANSINFO bo
+        inner  join BTB_COMPANYINFO  co
+        on co.bci_id=bo.bci_id
+        inner  join BTB_DEPUTYINFO de
+        on bo.BCI_ID=de.BCI_ID
+        where bo.BS_ID=5
+    </select>
+
+    <!--放款扣除本地银行卡金额-->
+    <update id="updateBank">
+        UPDATE BTB_LOVAL_BANKCARD set BLB_MONEY=BLB_MONEY-#{bli_money} WHERE BLB_NAME=#{blb_name}
+    </update>
+
+    <!--放款增加客户银行卡金额-->
+    <update id="updateMoney">
+        UPDATE BTB_COMPANYINFO set BCI_MONEY=BCI_MONEY+#{bli_money} WHERE BCI_ID=#{bci_id}
+    </update>
+
+    <!--放款更改放款状态-->
+    <update id="updateStatus">
+        update BTB_LOANSINFO set BS_ID=5 where BCI_ID=#{bci_id}
+    </update>
+
+    <select id="getTurn" resultType="Map">
+        SELECT   from BTB_COMPANYINFO co INNER  JOIN btb
+    </select>
+
+    <insert id="addZhang">
+        <selectKey resultType="int" keyProperty="BFI_ID" order="BEFORE">
+            select seq_BTB_FINANCEINFO.nextval from dual
+        </selectKey>
+        insert into BTB_FINANCEINFO VALUES (#{BFI_ID},#{bci_name},0,0,#{bli_money},#{bci_money},to_date(#{BFI_DATE},'yyyy-MM-dd'),#{BA_ID})
+    </insert>
+
+    <select id="getId" resultType="int">
+        SELECT BA_ID from BTB_COMPANYINFO WHERE BCI_ID=#{bci_id}
+    </select>
+
+    <select id="getMoney" resultType="Double">
+        SELECT BLB_MONEY from BTB_LOVAL_BANKCARD where BLB_ID=1
+    </select>
+</mapper>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/jquery3.3.1.min.js"></script>
+    <script>
+        $(function(){
+            //初始化年份下拉框，动态的，根据实际年份变化
+           var currentYear = new Date().getFullYear();
+            var options="";
+           for (var i = currentYear-5; i <= currentYear; i++) {
+                 if(i==currentYear)
+                     options+="<option value='"+i+"' selected='selected'>"+i+"年</option>"
+                 else
+                     options+="<option value='"+i+"'>"+i+"年</option>"
+            }
+           $("#year").append(options);
+        });
+    </script>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+年<select id="year">
+  </select>
+月<select id="month">
+     <option value="0">请选择</option>
+     <option value="01">1月</option>
+     <option value="02">2月</option>
+     <option value="03">3月</option>
+    <option value="04">4月</option>
+    <option value="05">5月</option>
+    <option value="06">6月</option>
+    <option value="07">7月</option>
+    <option value="08">8月</option>
+    <option value="09">9月</option>
+    <option value="10">10月</option>
+    <option value="11">11月</option>
+    <option value="12">12月</option>
+</select>
+
+<div id="main" style="width: 600px;height:400px;"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    var currentYear = new Date().getFullYear();
+
+    //初始化加载时，调用
+    getChartData(currentYear,0);
+
+    //当年份或者月份发生变化时，触发getChartData
+    $(function(){
+        $("#year").change(function(){
+            getChartData($("#year").val(),$("#month").val());
+        });
+        $("#month").change(function(){
+            getChartData($("#year").val(),$("#month").val());
+        });
+    });
+
+    function getChartData(year,month) {
+        var xdata=[];
+        var ydata1=[];
+        var ydata2=[];
+        $.ajax({
+            url: "/ercharts/getData",
+            data: {year: year,month:month},
+            dataType: "json",
+//            async: false,//必须是同步，方法返回值，并且赋值给变量后，才执行显示
+            success: function (data) {
+                // alert(1111);
+                if (data != null && data != 'null' && data != '' && data != 'undefined') {
+                    for (var i = 0; i < data.length; i++) {
+                        var d = data[i];
+                        xdata.push(d.BDATE);
+                        console.log(d.BDATE)
+                        ydata1.push(d.LOAN);
+                        ydata2.push(d.RETURN);
+                    }
+                }
+                var option = {
+                    title : {
+                        text: '网站资金统计',
+                        subtext: '真实数据'
+                    },
+                    tooltip : {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:['放款','还款']
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            dataView : {show: true, readOnly: false},
+                            magicType : {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    calculable : true,
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : xdata
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'放款',
+                            type:'bar',
+                            data:ydata1,
+                            markPoint : {
+                                data : [
+                                    {type : 'max', name: '最大值'},
+                                    {type : 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine : {
+                                data : [
+                                    {type : 'average', name: '平均值'}
+                                ]
+                            }
+                        },
+                        {
+                            name:'还款',
+                            type:'bar',
+                            data:ydata2,
+                            markPoint : {
+                                data : [
+                                    {type : 'max', name: '最大值'},
+                                    {type : 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine : {
+                                data : [
+                                    {type : 'average', name : '平均值'}
+                                ]
+                            }
+                        }
+                    ]
+                };
+
+
+                myChart.setOption(option);
+
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <!--页面框架样式-->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/components.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/main.css?ver=142682356" rel="stylesheet" />
+    <link href="/css/new-home.css?ver=142682356" rel="stylesheet" />
+    <!--页面框架样式-->
+
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/style.css"  />
+    <script src="/js/jquery-1.11.0.js"  type="text/javascript" charset="utf-8"></script>
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+        .el-aside {
+            color: #333;
+        }
+    </style>
+
+    <!--去除超链接的下划线样式-->
+    <style type="text/css">a {text-decoration: none}</style>
+    <script src="/js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div class="wrapper login">
+
+    <!--引入头部-->
+    <div id="head"></div>
+    <!--引入头部-->
+
+    <div id="app">
+    <!--主体部分开始-->
+    <el-container style="height: 600px; border-left: 430px solid #eee;width: 1500px;">
+        <!--侧边栏容器开始-->
+        <el-aside width="200px">
+            <!--菜单导航栏-->
+            <el-menu>
+                <el-menu-item-group><h3>个人中心</h3></el-menu-item-group>
+
+                <!--个人信息-->
+                <a href="GInformation.html"><el-menu-item >个人信息</el-menu-item></a>
+
+
+                <!--借款业务-->
+                <a href="MLoans.html"><el-menu-item >借款业务</el-menu-item></a>
+
+                <!--还款业务-->
+                <a href="Mfund.html"><el-menu-item >还款业务</el-menu-item></a>
+
+                <!--还款记录-->
+                <a href="MfundNotes.html"><el-menu-item >还款记录</el-menu-item></a>
+
+                <!--充值提现-->
+                <a href="MRefund.html"><el-menu-item >充值提现</el-menu-item></a>
+
+                <!--消息提示-->
+                <a href="MNotification.html"><el-menu-item >消息提示</el-menu-item></a>
+
+                <!--账号设置-->
+                <a href="MAccountSecurity.html"><el-menu-item >账号安全</el-menu-item></a>
+
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <!--头部栏容器-->
+            <el-header>账户安全</el-header>
+            <!--主要区域容器开始-->
+            <el-main>
+
+                <template>
+                    企业名：
+                    <span style="color: red" class="p1"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    企业代码：
+                    <span style="color: red" class="p2"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    手机号：
+                    <span style="color: red" class="p3"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    登录账号：
+                    <span style="color: red" class="p4"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    登录密码：
+                    <span style="color: red" class="p5"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    邮箱：
+                    <span style="color: red" class="p6"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    银行卡号：
+                    <span style="color: red" class="p7"></span>
+                </template>
+                <p></p>
+
+                <template>
+                    支付密码：
+                    <span style="color: red" class="p8"></span>
+                </template>
+                <p></p>
+                <div class="opts">
+                    <a href="javascript:;" class="tiyan" id="dianji">
+                        <span>修改信息</span>
+                        <em></em>
+                    </a>
+                </div>
+            </el-main>
+
+
+        </el-container>
+    </el-container>
+
+
+        <!--弹窗开始-->
+        <div class="tan">
+            <div class="box">
+                <div class="form">
+                    <h3>修改账户信息</h3>
+                    <form action="" onSubmit="return false;">
+                        <!--企业名：<input type="text" name="name" class="b1" />-->
+                        <!--企业代码：<input type="text" name="name" class="b2"  />-->
+                        手机号：<input type="text" name="name" class="b3"  />
+                        登录账号:<input type="text" name="name" class="b4"  />
+                        登录密码:<input type="text" name="name" class="b5"  />
+                        邮箱:<input type="text" name="name" class="b6"  />
+                        银行卡号:<input type="text" name="name" class="b7"  />
+                        支付密码:<input type="text" name="name" class="b8"  />
+                        <input type="text" name="name" class="b9" style="display: none"/>
+
+                        <input type="submit" id="Submit" value="修改">
+                        <input type="submit" id="close"  value="取消">
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <!--主体部分结束-->
+    </div>
+
+
+
+
+    <!--引入底部-->
+    <div id="last"></div>
+    <!--引入底部-->
+
+</div>
+<!--账户信息修改-->
+<script>
+    $(function(){
+        $.ajax({
+            url:"/modify/userAll",
+            dataType:"json",
+            type:"POST",
+            success:function(data){
+//                取出map中的用户数据
+                var zhanghao=data.BA_ZHANGHAO;
+                var password=data.BA_PASSWORD;
+                var tel=data.BA_TEL;
+                var bcname=data.BCI_NAME;
+                var bcdeal=data.BCI_DEAL;
+                var bcbusiness=data.BCI_BUSINESS;
+                var bcemail=data.BCI_EMAIL;
+                var bcbankcard=data.BCI_BANKCARD;
+//                动态展示
+                $(".p4").text(zhanghao);
+                $(".p5").text(password);
+                $(".p3").text(tel);
+                $(".p1").text(bcname);
+                $(".p8").text(bcdeal);
+                $(".p2").text(bcbusiness);
+                $(".p6").text(bcemail);
+                $(".p7").text(bcbankcard);
+
+            }
+        });
+
+    })
+</script>
+
+
+<!--弹窗-->
+<script type="text/javascript">
+    $(function () {
+        //弹窗
+        $('#dianji').click(function() {
+            $('.tan').show()
+
+            $.ajax({
+                url: "/modify/userAll",
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
+//                取出map中的用户数据
+                    var baid = data.BA_ID;
+                    var zhanghao = data.BA_ZHANGHAO;
+                    var password = data.BA_PASSWORD;
+                    var tel = data.BA_TEL;
+                    var bcname = data.BCI_NAME;
+                    var bcdeal = data.BCI_DEAL;
+                    var bcbusiness = data.BCI_BUSINESS;
+                    var bcemail = data.BCI_EMAIL;
+                    var bcbankcard = data.BCI_BANKCARD;
+
+
+                    $(".b9").val(baid);
+                    $(".b4").val(zhanghao);
+                    $(".b5").val(password);
+                    $(".b3").val(tel);
+//                    $(".b1").val(bcname);
+                    $(".b8").val(bcdeal);
+//                    $(".b2").val(bcbusiness);
+                    $(".b6").val(bcemail);
+                    $(".b7").val(bcbankcard);
+                }
+            })
+        })
+//关闭
+        $('#close').click(function() {
+            $('.tan').hide();
+        })
+
+//        去修改
+        $('#Submit').click(function() {
+            var baid = $(".b9").val();
+            var zhanghao = $(".b4").val();
+            var password = $(".b5").val();
+            var tel = $(".b3").val();
+            var bcdeal = $(".b8").val();
+            var bcemail = $(".b6").val();
+            var bcbankcard = $(".b7").val();
+
+
+            //            Ajax提交数据
+            $.ajax({
+                url: '/modify/update',
+                type: 'post',
+                data: {
+                    "baid":baid,
+                    "zhanghao":zhanghao,
+                    "password":password,
+                    "tel":tel,
+                    "bcdeal":bcdeal,
+                    "bcemail":bcemail,
+                    "bcbankcard":bcbankcard,
+                },
+                dataType: "text",
+
+                success: function (msg) {
+                    if (msg=="成功"){
+                        $('.tan').hide();
+                        location.href="/front/MAccountSecurity.html";
+                    }else {
+                        alert("修改失败");
+                        $('.tan').hide();
+                        location.href="/front/MAccountSecurity.html";
+                    }
+                }
+
+            });
+
+        })
+    })
+
+</script>
+
+<script>
+    var app = new Vue({
+        el:"#app",
+        data:{},
+        methods: {
+            open1() {
+                this.$prompt('请输入姓名', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: '',
+                    inputErrorMessage: ''
+                }).then(({value}) => {
+                    this.$message({
+                        type: 'success',
+                        message: '你的姓名是: ' + value
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
+            open2() {
+                this.$prompt('请输入联系方式',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^[1][63578][0-9]{9}$/,
+                    inputErrorMessage: '请输入正确的手机号'
+                }).then(({value}) => {
+                    this.$message({
+                        type: 'success',
+                        message: '你的联系方式是: ' + value
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
+            open3() {
+            this.$prompt('请输入邮箱', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+                inputErrorMessage: '邮箱格式不正确'
+            }).then(({ value }) => {
+                this.$message({
+                    type: 'success',
+                    message: '你的邮箱是: ' + value
+                });
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消输入'
+                });
+            });
+        },
+            open4() {
+                this.$prompt('请输入登陆密码', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: '',
+                    inputErrorMessage: ''
+                }).then(({value}) => {
+                    this.$message({
+                        type: 'success',
+                        message: '你的登陆密码是: ' + value
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
+            open5() {
+                this.$prompt('请输入交易密码', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: '',
+                    inputErrorMessage: ''
+                }).then(({value}) => {
+                    this.$message({
+                        type: 'success',
+                        message: '你的交易密码是: ' + value
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
+        }
+    })
+</script>
+</body>
+</html>
+<script>
+    $("#head").load("head.html");
+    $("#last").load("last.html");
+</script>

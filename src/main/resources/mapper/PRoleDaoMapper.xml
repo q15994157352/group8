@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.PRoleDao">
+    <!--<select id="listRole" resultType="role">-->
+        <!--SELECT  * from btb_role-->
+    <!--</select>-->
+    <!--<insert id="saveRole">-->
+       <!--INSERT  into btb_role VALUES (#{br_id},#{br_name})-->
+    <!--</insert>-->
+    <!--<update id="updateRole">-->
+         <!--update btb_role set br_name = #{br_name} where br_id = #{br_id}-->
+    <!--</update>-->
+    <!--<delete id="deleteRole">-->
+        <!--DELETE FROM  btb_role WHERE br_id=#{br_id}-->
+    <!--</delete>-->
+</mapper>

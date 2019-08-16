@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>后台首页</title>
+    <!--<script src="js/vue.js"></script>-->
+    <!--vue-->
+    <script src="/vue/vue.js"></script>
+    <!--axios.min.js-->
+    <script src="/vue/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/element/index.css">
+    <!-- 引入组件库 -->
+    <script src="/element/index.js"></script>
+    <style>
+        .el-header, .el-footer {
+            background-color: #B3C0D1;
+            color: #333;
+            font-size: 30px;
+            font-family: 宋体;
+            text-align: center;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            background-color: #D3DCE6;
+            color: #333;
+            text-align: center;
+            line-height: 38px;
+            height: 970px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            height: 970px;
+        }
+
+        body > .el-container {
+            margin-bottom: 40px;
+        }
+
+        .el-container:nth-child(5) .el-aside,
+        .el-container:nth-child(6) .el-aside {
+            line-height: 260px;
+        }
+        .el-container:nth-child(7) .el-aside {
+            line-height: 320px;
+        }
+        #exit{
+           text-underline: none;
+            padding-left:1650px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>欢迎登陆点融网贷款</el-header>
+        <div id="exit">
+            <div id="right">
+                <span>欢迎：<el-link type="info" style="color: blue">{{AdminName}}</el-link></span>
+                <template>
+                    <el-button type="text" @click="open">退出</el-button>
+                </template>
+                <template id="return">
+                    <a href="/front/index.html">返回首页</a>
+                </template>
+            </div>
+        </div>
+        <el-container>
+            <el-aside width="200px">
+                <el-tree :data="data" default-expand-all @node-click="handleNodeClick"></el-tree>
+            </el-aside>
+            <el-main>
+                <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
+                    <el-tab-pane
+                            v-for="(item, index) in editableTabs"
+                            :key="item.name"
+                            :label="item.title"
+                            :name="item.name"
+                    >
+                        <iframe :src="item.url" style="width:100%;height:800px;border: 0px;" scrolling="auto" ></iframe>
+                    </el-tab-pane>
+                </el-tabs>
+
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+<script>
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            AdminName:[],
+            data: [],
+            editableTabsValue: '1',
+            editableTabs: [{
+                title: '默认主页',
+                name: '1',
+                url:'/BackStageUser/Ercharts.html'
+            }],
+            tabIndex: 1
+
+        },
+        created: function () {
+            var self =this;
+            //动态取出权限树数据
+            axios.get('/treeLists')
+                .then(function (response) {
+                    console.log(JSON.stringify(response.data));
+                    self.data =response.data.powerList;
+                    self.AdminName=response.data.userName;
+                });
+        },
+        methods:{
+            open: function () {
+                this.$confirm('否出后台登录?', '提示', {
+                    confirmButtonText: '退出',
+                    cancelButtonText: '取消',
+                }).then(() => {
+                    var self = this;
+                    axios.get("/logout").then(function (response) {
+                        if (response.data > 0) {
+                            location.href = "tologin.html";
+                            self.$message({
+                                type: 'success',
+                                message: '退出成功!'
+                            });
+
+                        }
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消'
+                    });
+                })
+            },
+            return:function () {
+            },
+            handleNodeClick:function(data) {
+                if(data.url!=null&&data.url!='null'&&data.url!=''&&data.url!='undefined'){
+                    this.addTab(data.label,data.url);
+                }
+                //console.log(data);
+            },
+            addTab:function(targetName,url) {
+                var newTabName = targetName + '';
+                //  alert(JSON.stringify(this.editableTabs));
+                if (JSON.stringify(this.editableTabs).indexOf(newTabName) == -1) {
+                    this.editableTabs.push({
+                        title: newTabName,
+                        name: newTabName,
+                        url: url
+                    });
+                }
+                this.editableTabsValue = newTabName;
+            },
+            removeTab:function(targetName) {
+                var tabs = this.editableTabs;
+                var activeName = this.editableTabsValue;
+                if (activeName === targetName) {
+                    tabs.forEach(function(tab, index){
+                        if (tab.name === targetName) {
+                            var nextTab = tabs[index + 1] || tabs[index - 1];
+                            if (nextTab) {
+                                activeName = nextTab.name;
+                            }
+                        }
+                    });
+                }
+
+                this.editableTabsValue = activeName;
+                this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+            }
+        }
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.WBorrowMoneyDao">
+    <!--公司审核-->
+    <select id="boList" resultType="com.aaa.group8.entity.BorrowMoney">
+    SELECT * FROM BTB_COMPANYINFO c INNER JOIN BTB_DEPUTYINFO de on de.BCI_ID=c.BCI_ID INNER JOIN btb_state bs on c.BS_ID=bs.bs_id AND c.BS_ID=0
+</select>
+    <select id="rejectList" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM BTB_REJECT boi INNER JOIN BTB_COMPANYINFO c ON boi.BCI_ID=c.BCI_ID INNER JOIN BTB_ADMIN ba ON boi.BA_ID=ba.BA_ID INNER JOIN BTB_USER bu ON boi.BU_ID=bu.BU_ID INNER JOIN BTB_LOANSINFO bli ON boi.BLI_ID=bli.BLI_ID
+    </select>
+
+    <!--贷款审核-->
+    <select id="bsList" resultType="com.aaa.group8.entity.BorrowMoney">
+     SELECT * FROM BTB_LOANSINFO boi INNER JOIN BTB_COMPANYINFO c on boi.BCI_ID=c.BCI_ID INNER JOIN BTB_USER bu on boi.BU_ID=bu.BU_ID INNER JOIN btb_state bs on boi.BS_ID=bs.bs_id AND bs.bs_id=4
+    </select>
+    <!--根据参数查询公司分页列表-->
+    <select id="getboPaging" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT ROWNUM rn,c.BCI_ID,bs.BS_ID,de.BDI_ID,c.bci_name,c.BCI_TYPE,c.BCI_BANKCARD,c.BCI_ADDRESS,c.BCI_EMAIL,c.BCI_BUSINESS,c.BCI_HEADPICNAME,c.BCI_HEADPIC,de.BDI_SEX,de.BDI_TEL,de.BDI_HEADPIC_N,de.BDI_HEADPIC_P
+        ,de.BDI_NAME,bs.bs_state,ba.BA_ID FROM
+        BTB_COMPANYINFO c INNER JOIN BTB_DEPUTYINFO de on de.BCI_ID=c.BCI_ID INNER JOIN btb_state bs on c.BS_ID=bs.bs_id INNER JOIN BTB_ADMIN ba ON ba.BA_ID=c.BA_ID AND c.BS_ID=0
+        <where>
+            <if test="bci_id!=null and bci_id !=''">
+                and  bci_id =#{bci_id}
+            </if>
+            <if test="BDI_ID!=null and BDI_ID !=0">
+                and BDI_ID =#{bdi_id}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--公司分页总数量-->
+    <select id="getPagingMap" resultType="int">
+        SELECT COUNT (*) FROM BTB_COMPANYINFO c INNER JOIN BTB_DEPUTYINFO de on de.BCI_ID=c.BCI_ID INNER JOIN btb_state bs on c.BS_ID=bs.bs_id INNER JOIN BTB_ADMIN ba ON ba.BA_ID=c.BA_ID AND c.BS_ID=0
+        </select>
+    <update id="update">
+        UPDATE BTB_COMPANYINFO set bs_id=4 where BCI_ID=#{bci_id}
+    </update>
+    <update id="reason">
+        UPDATE BTB_COMPANYINFO set bs_id=2 where BCI_ID=#{bci_id}
+    </update>
+    <update id="updateA">
+        UPDATE BTB_LOANSINFO set bs_id=1 where BLI_ID=#{bli_id}
+    </update>
+    <update id="reasonA">
+        UPDATE BTB_LOANSINFO set bs_id=2 where BLI_ID=#{bli_id}
+    </update>
+    <update id="updateB">
+        UPDATE BTB_LOANSINFO set bs_id=3 where BLI_ID=#{bli_id}
+    </update>
+
+    <!--根据参数查询借款分页列表-->
+    <select id="getbePaging" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT distinct ROWNUM rn,boi.BLI_ID,c.BCI_ID,bu.BU_ID,ba.BA_ID,ba.BA_ZHANGHAO,boi.BLI_INSTALMENT,bd.BDI_NAME,bd.BDI_TEL,boi.BLI_MONEY,boi.BLI_DATE,c.BCI_EMAIL,boi.BLI_RATE,c.BCI_NAME,bu.BU_USERNAME,bs.bs_state FROM
+        BTB_LOANSINFO boi INNER JOIN BTB_COMPANYINFO c on boi.BCI_ID=c.BCI_ID INNER JOIN BTB_USER bu on boi.BU_ID=bu.BU_ID INNER JOIN btb_state bs on boi.BS_ID=bs.bs_id INNER JOIN BTB_DEPUTYINFO bd ON c.BCI_ID=bd.BCI_ID INNER JOIN BTB_ADMIN ba ON c.BA_ID=ba.BA_ID AND bs.bs_id=4
+        <where>
+            <if test="BLI_ID!=null and BLI_ID !=''">
+                and  BLI_ID =#{bli_id}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--借款分页总数量-->
+    <select id="getbePagingMap" resultType="int">
+        SELECT COUNT (*) FROM  BTB_LOANSINFO boi INNER JOIN BTB_COMPANYINFO c on boi.BCI_ID=c.BCI_ID INNER JOIN BTB_USER bu on boi.BU_ID=bu.BU_ID INNER JOIN btb_state bs on boi.BS_ID=bs.bs_id INNER JOIN BTB_DEPUTYINFO bd ON c.BCI_ID=bd.BCI_ID INNER JOIN BTB_ADMIN ba ON c.BA_ID=ba.BA_ID AND bs.bs_id=4
+        </select>
+    <!--根据参数查询借款分页列表-->
+    <select id="PagingA" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT distinct ROWNUM rn,boi.BLI_ID,c.BCI_ID,bu.BU_ID,ba.BA_ID,ba.BA_ZHANGHAO,boi.BLI_INSTALMENT,bd.BDI_NAME,bd.BDI_TEL,boi.BLI_MONEY,boi.BLI_DATE,c.BCI_EMAIL,boi.BLI_RATE,c.BCI_NAME,bu.BU_USERNAME,bs.bs_state FROM
+        BTB_LOANSINFO boi INNER JOIN BTB_COMPANYINFO c on boi.BCI_ID=c.BCI_ID INNER JOIN BTB_USER bu on boi.BU_ID=bu.BU_ID INNER JOIN btb_state bs on boi.BS_ID=bs.bs_id INNER JOIN BTB_DEPUTYINFO bd ON c.BCI_ID=bd.BCI_ID INNER JOIN BTB_ADMIN ba ON c.BA_ID=ba.BA_ID AND bs.bs_id=1
+        <where>
+            <if test="BLI_ID!=null and BLI_ID !=''">
+                and  BLI_ID =#{bli_id}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--借款分页总数量-->
+    <select id="PagingMapA" resultType="int">
+        SELECT COUNT (*) FROM  BTB_LOANSINFO boi INNER JOIN BTB_COMPANYINFO c on boi.BCI_ID=c.BCI_ID INNER JOIN BTB_USER bu on boi.BU_ID=bu.BU_ID INNER JOIN btb_state bs on boi.BS_ID=bs.bs_id INNER JOIN BTB_DEPUTYINFO bd ON c.BCI_ID=bd.BCI_ID INNER JOIN BTB_ADMIN ba ON c.BA_ID=ba.BA_ID AND bs.bs_id=1
+        </select>
+    <!--贷款审核驳回添加到驳回表中-->
+    <insert id="rejectMessage">
+        insert into BTB_REJECT VALUES(seq_btb_reject.nextval,#{bci_id},#{reason},sysdate,1,#{ba_id},#{bu_id},#{bli_id})
+    </insert>
+    <!--公司审核驳回添加到驳回表中-->
+    <insert id="rejectMessageA">
+        insert into BTB_REJECT VALUES(seq_btb_reject.nextval,#{bci_id},#{reason},sysdate,2,#{ba_id},2,0)
+    </insert>
+    <!--公司审核通过添加到历史表中-->
+    <insert id="passMessage">
+    INSERT INTO BTB_PASS VALUES (seq_btb_pass.nextval,#{bci_id},sysdate,#{ba_id},2,0,1)
+    </insert>
+    <!--贷款审核通过添加到历史表中-->
+    <insert id="passMessageA">
+    INSERT INTO BTB_PASS VALUES (seq_btb_pass.nextval,#{bci_id},sysdate,#{ba_id},2,#{bli_id},2)
+     </insert>
+    <!--公司审核通过修改状态-->
+    <update id="updateC">
+        UPDATE BTB_LOANSINFO SET bs_id =4 where BCI_ID=#{bci_id}
+    </update>
+    <!--根据参数查询驳回分页列表-->
+    <select id="rejectA" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT distinct ROWNUM rn,c.BCI_NAME,c.BCI_ID,bu.BU_ID,bu.BU_USERNAME,ba.BA_ID,ba.BA_ZHANGHAO,boi.BOI_ID,boi.REASON,boi.REJECTTIME,boi.PHASE FROM
+        BTB_REJECT boi INNER JOIN BTB_COMPANYINFO c ON boi.BCI_ID=c.BCI_ID INNER JOIN BTB_ADMIN ba ON boi.BA_ID=ba.BA_ID INNER JOIN BTB_USER bu ON boi.BU_ID=bu.BU_ID
+        <where>
+            <if test="BOI_ID!=null and BOI_ID !=''">
+                and  BOI_ID =#{BOI_ID}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--借款驳回总数量-->
+    <select id="rejectAMap" resultType="int">
+        SELECT COUNT (*) FROM  BTB_REJECT boi INNER JOIN BTB_COMPANYINFO c ON boi.BCI_ID=c.BCI_ID INNER JOIN BTB_ADMIN ba ON boi.BA_ID=ba.BA_ID INNER JOIN BTB_USER bu ON boi.BU_ID=bu.BU_ID
+    </select>
+    <!--根据参数查询通过分页列表-->
+    <select id="passList" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT distinct ROWNUM rn,bp.BP_ID,bp.PASSTIME,bp.BP_state,c.BCI_ID,c.BCI_NAME,bu.BU_ID,bu.BU_USERNAME,ba.BA_ID,ba.BA_ZHANGHAO FROM
+        BTB_PASS bp INNER JOIN BTB_COMPANYINFO c on bp.BCI_ID=c.BCI_ID INNER JOIN BTB_ADMIN ba ON bp.BA_ID=ba.BA_ID INNER JOIN BTB_USER bu ON bp.BU_ID=bu.BU_ID
+        <where>
+            <if test="BP_ID!=null and BP_ID !=''">
+                and  BP_ID =#{BP_ID}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--借款通过总数量-->
+    <select id="passListA" resultType="int">
+        SELECT COUNT (*) FROM  BTB_PASS bp INNER JOIN BTB_COMPANYINFO c on bp.BCI_ID=c.BCI_ID INNER JOIN BTB_ADMIN ba ON bp.BA_ID=ba.BA_ID INNER JOIN BTB_USER bu ON bp.BU_ID=bu.BU_ID
+    </select>
+    <select id="reList" resultType="com.aaa.group8.entity.BorrowMoney">
+        SELECT * FROM
+        (SELECT distinct ROWNUM rn,bx.BYI_ID,bx.BLI_MONEY,bx.BXI_MONEY,c.BCI_ID,c.BCI_NAME,bx.BYI_DATE,bx.BXI_INSTALMENT,bx.BXI_MONTH FROM
+        BTB_XMIT bx INNER JOIN BTB_COMPANYINFO c ON bx.BCI_ID=c.BCI_ID
+        <where>
+            <if test="BYI_ID!=null and BYI_ID !=''">
+                and  BYI_ID =#{BYI_ID}
+            </if>
+            <if test="end">
+                and rownum &lt; #{end}
+            </if>
+        </where>
+        ) where rn &gt; #{start}
+    </select>
+    <!--借款通过总数量-->
+    <select id="reListA" resultType="int">
+        SELECT COUNT (*) FROM  BTB_XMIT bx INNER JOIN BTB_COMPANYINFO c ON bx.BCI_ID=c.BCI_ID
+    </select>
+</mapper>
+

@@ -1,0 +1,46 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.group8.dao.PsysMsgDao">
+<insert id="addSystMeg">
+    insert into btb_system values(btb_system_bs_id.nextval,#{bs_message},1,sysdate,#{ba_id},#{bs_status})
+</insert>
+
+<select id="getAllMessage" resultType="map">
+select * from(
+select  bs_id,bs_message,bs_date,bs_status,rownum rn from btb_system
+<where>
+    rownum &lt; #{end}
+    <if test="ba_id!=null and ba_id!=''">
+        and ba_id=#{ba_id}
+    </if>
+    <if test="bs_state!=null and bs_state!=''">
+        and bs_state=#{bs_state}
+    </if>
+</where>
+)a where a.rn &gt; #{start}
+</select>
+
+<select id="getUAllMessage" resultType="int">
+select count(*) as messageNum from BTB_SYSTEM where BS_STATE=1 and ba_id=#{ba_id}
+</select>
+
+<select id="getTotal" resultType="int">
+select count(*) from BTB_SYSTEM
+<where>
+    <if test="ba_id!=null and ba_id!=''">
+        ba_id=#{ba_id}
+    </if>
+    <if test="bs_state!=null and bs_state!=''">
+        and bs_state=#{bs_state}
+    </if>
+</where>
+</select>
+
+<delete id="delMessage">
+delete from btb_system where bs_id=#{bs_id}
+</delete>
+
+<update id="updateMessage">
+update btb_system set bs_state=2 where ba_id=#{ba_id}
+</update>
+</mapper>
